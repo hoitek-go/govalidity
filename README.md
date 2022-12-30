@@ -182,7 +182,19 @@ schema := govalidity.Schema{
 You can set default value for each fields in the schema like this:
 ~~~bash  
 schema := govalidity.Schema{
-    "name": govalidity.New().Int().Default("20"),
+    "age": govalidity.New().Int().Default("20"),
+}
+~~~
+
+## Optional Field
+
+If you don't call Required() validator in schema field, your field can be optional.
+
+So you can define optional fields in the schema like this:
+
+~~~bash  
+schema := govalidity.Schema{
+    "ge": govalidity.New().Int(),
 }
 ~~~
 
