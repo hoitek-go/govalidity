@@ -111,25 +111,19 @@ govalidity.SetDefaultErrorMessages(&govaliditym.Validations{
 
 You can use the following attributes in all error messages:
 ~~~go  
-{field} // show the name of the field in the error message
-~~~  
-~~~go  
+{field} // show the name of the field in the error message 
 {value} // show the value of the user's input in the error message
 ~~~  
 
 You can use the following attributes in Range() validator:
 ~~~go  
-{from} // show the minimum value of Range() validator in the error message
-~~~  
-~~~go  
+{from} // show the minimum value of Range() validator in the error message 
 {to} // show the maximum value of Range() validator in the error message
 ~~~  
 
 You can use the following attributes in MinMaxLength() validator:
 ~~~go  
-{min} // show the minimum value of MinMaxLength() validator in the error message
-~~~  
-~~~go  
+{min} // show the minimum value of MinMaxLength() validator in the error message 
 {max} // show the maximum value of MinMaxLength() validator in the error message
 ~~~  
 
@@ -172,19 +166,20 @@ For example we want to define a custom validator to check if the name is "saeed"
 To do that you can define you schema like this:
 
 ~~~bash  
+func CheckName(field string, params ...interface{}) (bool, error) {
+	if params[0].(string) != "saeed" {
+		return false, errors.New("{field} can be \"saeed\", but you send {value}")
+	}
+	return true, nil
+}
 schema := govalidity.Schema{
-    "name": govalidity.New().CustomValidator(func(field string, params ...interface{}) (bool, error) {
-        if params[0].(string) != "saeed" {
-            return false, errors.New("{field} can be \"saeed\", but you send {value}")
-        }
-        return true, nil
-    }).Required(),
+    "name": govalidity.New().CustomValidator(CheckName).Required(),
 }
 ~~~
 
 ## Default Value
 
-You can set default value for each field in the schema like this:
+You can set default value for each fields in the schema like this:
 ~~~bash  
 schema := govalidity.Schema{
     "name": govalidity.New().Int().Default("20"),
