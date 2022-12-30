@@ -1,0 +1,1031 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>govalidity: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/hoitek-go/govalidity/govalidity.go (100.0%)</option>
+				
+				<option value="file1">github.com/hoitek-go/govalidity/govaliditybody/body.go (100.0%)</option>
+				
+				<option value="file2">github.com/hoitek-go/govalidity/govalidityconv/converter.go (100.0%)</option>
+				
+				<option value="file3">github.com/hoitek-go/govalidity/govaliditym/messages.go (100.0%)</option>
+				
+				<option value="file4">github.com/hoitek-go/govalidity/govalidityv/validators.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package govalidity
+
+import (
+        "encoding/json"
+        "net/http"
+
+        "github.com/hoitek-go/govalidity/govaliditybody"
+        "github.com/hoitek-go/govalidity/govaliditym"
+        "github.com/hoitek-go/govalidity/govalidityv"
+)
+
+type Schema = map[string]*Validator
+type ValidationErrors = map[string][]error
+type Body = map[string]interface{}
+
+type FuncSchema struct {
+        Fn func(string, ...interface{}) (bool, error)
+}
+
+type Validator struct {
+        Field        string
+        Value        interface{}
+        DefaultValue string
+        Errors       []error
+        Validations  []FuncSchema
+}
+
+func New() *Validator <span class="cov8" title="1">{
+        return &amp;Validator{
+                Validations: []FuncSchema{},
+        }
+}</span>
+
+func (v *Validator) Email() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsEmail,
+        })
+        return v
+}</span>
+
+func (v *Validator) Required() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsRequired,
+        })
+        return v
+}</span>
+
+func (v *Validator) Number() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsNumber,
+        })
+        return v
+}</span>
+
+func (v *Validator) Url() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsUrl,
+        })
+        return v
+}</span>
+
+func (v *Validator) Alpha() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsAlpha,
+        })
+        return v
+}</span>
+
+func (v *Validator) LowerCase() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsLowerCase,
+        })
+        return v
+}</span>
+
+func (v *Validator) UpperCase() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsUpperCase,
+        })
+        return v
+}</span>
+
+func (v *Validator) Int() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsInt,
+        })
+        return v
+}</span>
+
+func (v *Validator) Float() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsFloat,
+        })
+        return v
+}</span>
+
+func (v *Validator) Json() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsJson,
+        })
+        return v
+}</span>
+
+func (v *Validator) Ip() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsIp,
+        })
+        return v
+}</span>
+
+func (v *Validator) IpV4() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsIpV4,
+        })
+        return v
+}</span>
+
+func (v *Validator) IpV6() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsIpV6,
+        })
+        return v
+}</span>
+
+func (v *Validator) Port() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsPort,
+        })
+        return v
+}</span>
+
+func (v *Validator) IsDNSName() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsDNSName,
+        })
+        return v
+}</span>
+
+func (v *Validator) Host() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsHost,
+        })
+        return v
+}</span>
+
+func (v *Validator) Latitude() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsLatitude,
+        })
+        return v
+}</span>
+
+func (v *Validator) Logitude() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsLogitude,
+        })
+        return v
+}</span>
+
+func (v *Validator) AlpaNum() *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: govalidityv.IsAlphaNum,
+        })
+        return v
+}</span>
+
+func (v *Validator) InRange(from, to int) *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: func(f string, i ...interface{}) (bool, error) </span><span class="cov8" title="1">{
+                        return govalidityv.IsInRange(f, v.Value, from, to)
+                }</span>,
+        })
+        <span class="cov8" title="1">return v</span>
+}
+
+func (v *Validator) MinMaxLength(min, max int) *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: func(f string, i ...interface{}) (bool, error) </span><span class="cov8" title="1">{
+                        return govalidityv.IsMinMaxLength(f, v.Value, min, max)
+                }</span>,
+        })
+        <span class="cov8" title="1">return v</span>
+}
+
+func (v *Validator) MinLength(min int) *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: func(f string, i ...interface{}) (bool, error) </span><span class="cov8" title="1">{
+                        return govalidityv.IsMinLength(f, v.Value, min)
+                }</span>,
+        })
+        <span class="cov8" title="1">return v</span>
+}
+
+func (v *Validator) MaxLength(max int) *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: func(f string, i ...interface{}) (bool, error) </span><span class="cov8" title="1">{
+                        return govalidityv.IsMaxLength(f, v.Value, max)
+                }</span>,
+        })
+        <span class="cov8" title="1">return v</span>
+}
+
+func (v *Validator) In(in []string) *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: func(f string, i ...interface{}) (bool, error) </span><span class="cov8" title="1">{
+                        return govalidityv.IsIn(f, v.Value, in)
+                }</span>,
+        })
+        <span class="cov8" title="1">return v</span>
+}
+
+func (v *Validator) CustomValidator(fn func(string, ...interface{}) (bool, error)) *Validator <span class="cov8" title="1">{
+        v.Validations = append(v.Validations, FuncSchema{
+                Fn: func(f string, i ...interface{}) (bool, error) </span><span class="cov8" title="1">{
+                        isValid, err := fn(v.Field, v.Value)
+                        label, value := govalidityv.GetFieldLabelAndValue(v.Field, []interface{}{v.Value})
+                        if err != nil </span><span class="cov8" title="1">{
+                                err = govalidityv.GetErrorMessageByFieldValue(err.Error(), label, value)
+                        }</span>
+                        <span class="cov8" title="1">return isValid, err</span>
+                },
+        })
+        <span class="cov8" title="1">return v</span>
+}
+
+func (v *Validator) Default(value string) *Validator <span class="cov8" title="1">{
+        v.DefaultValue = value
+        return v
+}</span>
+
+func ValidateBody(r *http.Request, validations Schema) (bool, ValidationErrors, Body) <span class="cov8" title="1">{
+        var dataMap Body
+        err := govaliditybody.Bind(r, &amp;dataMap)
+        if err != nil </span><span class="cov8" title="1">{
+                return false, ValidationErrors{
+                        "UnknownError": []error{
+                                err,
+                        },
+                }, nil
+        }</span>
+        <span class="cov8" title="1">validationErrors := ValidationErrors{}
+        isValid := true
+        for k, v := range validations </span><span class="cov8" title="1">{
+                value, ok := dataMap[k]
+                if !ok </span><span class="cov8" title="1">{
+                        value = ""
+                        if v.DefaultValue != "" </span><span class="cov8" title="1">{
+                                value = v.DefaultValue
+                                dataMap[k] = value
+                        }</span>
+                }
+                <span class="cov8" title="1">v.Field = k
+                v.Value = value
+                errs := v.run()
+                if len(errs) &gt; 0 </span><span class="cov8" title="1">{
+                        isValid = false
+                }</span>
+                <span class="cov8" title="1">if len(errs) &gt; 0 </span><span class="cov8" title="1">{
+                        validationErrors[v.Field] = errs
+                }</span>
+        }
+        <span class="cov8" title="1">return isValid, validationErrors, dataMap</span>
+}
+
+func SetDefaultErrorMessages(v *govaliditym.Validations) <span class="cov8" title="1">{
+        govaliditym.SetMessages(v)
+}</span>
+
+func SetFieldLabels(l *govaliditym.Labels) <span class="cov8" title="1">{
+        govaliditym.SetFieldLables(l)
+}</span>
+
+func (v *Validator) run() []error <span class="cov8" title="1">{
+        errs := []error{}
+        for _, validation := range v.Validations </span><span class="cov8" title="1">{
+                isValid, err := validation.Fn(v.Field, v.Value.(string))
+                if !isValid </span><span class="cov8" title="1">{
+                        errs = append(errs, err)
+                }</span>
+        }
+        <span class="cov8" title="1">return errs</span>
+}
+
+func GetBodyFromJson(dataMap Body, result interface{}) error <span class="cov8" title="1">{
+        bytes, err := json.Marshal(dataMap)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">err = json.Unmarshal(bytes, result)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package govaliditybody
+
+import (
+        "encoding/json"
+        "io"
+        "math"
+        "net/http"
+)
+
+var (
+        IsTestMarshal         = false
+        IsTestUnMarshal       = false
+        IsTestParsedData      = false
+        IsTestResultUnMarshal = false
+)
+
+func Bind(r *http.Request, result any) error <span class="cov8" title="1">{
+        if r.PostForm == nil </span><span class="cov8" title="1">{
+                r.ParseMultipartForm(32 &lt;&lt; 20)
+                r.ParseForm()
+        }</span>
+        <span class="cov8" title="1">parsedData := map[string]interface{}{}
+        bodyRaw, err := io.ReadAll(r.Body)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if len(bodyRaw) &gt; 0 </span><span class="cov8" title="1">{
+                err = json.Unmarshal([]byte(bodyRaw), &amp;parsedData)
+                if err != nil </span><span class="cov8" title="1">{
+                        return err
+                }</span>
+        } else<span class="cov8" title="1"> {
+                data, err := json.Marshal(r.Form)
+                if IsTestMarshal </span><span class="cov8" title="1">{
+                        data, err = json.Marshal(math.Inf(1))
+                }</span>
+                <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">dataMap := make(map[string][]interface{})
+                err = json.Unmarshal(data, &amp;dataMap)
+                if IsTestUnMarshal </span><span class="cov8" title="1">{
+                        var test *int = nil
+                        err = json.Unmarshal(data, test)
+                }</span>
+                <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">for key, value := range dataMap </span><span class="cov8" title="1">{
+                        parsedData[key] = value[0]
+                }</span>
+        }
+        <span class="cov8" title="1">byteArray, err := json.Marshal(parsedData)
+        if IsTestParsedData </span><span class="cov8" title="1">{
+                byteArray, err = json.Marshal(math.Inf(1))
+        }</span>
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if IsTestResultUnMarshal </span><span class="cov8" title="1">{
+                result = nil
+        }</span>
+        <span class="cov8" title="1">err = json.Unmarshal(byteArray, result)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package govalidityconv
+
+import (
+        "fmt"
+        "reflect"
+        "strconv"
+)
+
+func ToNumber(value interface{}) (res *float64, err error) <span class="cov8" title="1">{
+        val := reflect.ValueOf(value)
+
+        switch value.(type) </span>{
+        case int, int8, int16, int32, int64:<span class="cov8" title="1">
+                result := float64(val.Int())
+                res = &amp;result</span>
+        case uint, uint8, uint16, uint32, uint64:<span class="cov8" title="1">
+                result := float64(val.Uint())
+                res = &amp;result</span>
+        case float32, float64:<span class="cov8" title="1">
+                result := float64(val.Float())
+                res = &amp;result</span>
+        case string:<span class="cov8" title="1">
+                result, err := strconv.ParseFloat(val.String(), 0)
+                if err != nil </span><span class="cov8" title="1">{
+                        res = nil
+                }</span> else<span class="cov8" title="1"> {
+                        res = &amp;result
+                }</span>
+        default:<span class="cov8" title="1">
+                err = fmt.Errorf("ToInt: unknown interface type %T", value)
+                res = nil</span>
+        }
+
+        <span class="cov8" title="1">return</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package govaliditym
+
+import "encoding/json"
+
+var DefaultErrorMessages map[string]string = map[string]string{
+        "IsEmail":        "{field} should be a valid email",
+        "IsRequired":     "{field} can not be empty",
+        "IsNumber":       "{field} can be a valid number",
+        "IsUrl":          "{field} can be a valid url",
+        "IsAlpha":        "{field} can only contain alphabet characters",
+        "IsLowerCase":    "{field} can only be lowercase",
+        "IsUpperCase":    "{field} can only be uppercase",
+        "IsInt":          "{field} can only be a valid integer number",
+        "IsFloat":        "{field} can only be a float number",
+        "IsJson":         "{field} can only be json",
+        "IsIp":           "{field} can only be a valid ip",
+        "IsIpV4":         "{field} can only be a valid ipv4",
+        "IsIpV6":         "{field} can only be a valid ipv6",
+        "IsPort":         "{field} can only be a valid port",
+        "IsDNSName":      "{field} can only be a valid dns name",
+        "IsHost":         "{field} can only be a valid host",
+        "IsLatitude":     "{field} can only be a valid latitude number",
+        "IsLogitude":     "{field} can only be a valid logitude number",
+        "IsAlphaNum":     "{field} can only contain alphabet characters and numbers",
+        "IsInRange":      "{field} can only be in range {from} and {to}",
+        "IsMinMaxLength": "{field} can only have {min} to {max} characters",
+        "IsMinLength":    "{field} can only have more than {min} characters",
+        "IsMaxLength":    "{field} can only have less than {max} characters",
+        "IsIn":           "{field} can only be {in}",
+}
+
+type Validations struct {
+        IsEmail        string
+        IsRequired     string
+        IsNumber       string
+        IsUrl          string
+        IsAlpha        string
+        IsLowerCase    string
+        IsUpperCase    string
+        IsInt          string
+        IsFloat        string
+        IsJson         string
+        IsIp           string
+        IsIpV4         string
+        IsIpV6         string
+        IsPort         string
+        IsDNSName      string
+        IsHost         string
+        IsLatitude     string
+        IsLogitude     string
+        IsAlphaNum     string
+        IsInRange      string
+        IsMinMaxLength string
+        IsMinLength    string
+        IsMaxLength    string
+        IsIn           string
+}
+
+type Labels = map[string]string
+
+var Default *Validations = &amp;Validations{
+        IsEmail:        DefaultErrorMessages["IsEmail"],
+        IsRequired:     DefaultErrorMessages["IsRequired"],
+        IsNumber:       DefaultErrorMessages["IsNumber"],
+        IsUrl:          DefaultErrorMessages["IsUrl"],
+        IsAlpha:        DefaultErrorMessages["IsAlpha"],
+        IsLowerCase:    DefaultErrorMessages["IsLowerCase"],
+        IsUpperCase:    DefaultErrorMessages["IsUpperCase"],
+        IsInt:          DefaultErrorMessages["IsInt"],
+        IsFloat:        DefaultErrorMessages["IsFloat"],
+        IsJson:         DefaultErrorMessages["IsJson"],
+        IsIp:           DefaultErrorMessages["IsIp"],
+        IsIpV4:         DefaultErrorMessages["IsIpV4"],
+        IsIpV6:         DefaultErrorMessages["IsIpV6"],
+        IsPort:         DefaultErrorMessages["IsPort"],
+        IsDNSName:      DefaultErrorMessages["IsDNSName"],
+        IsHost:         DefaultErrorMessages["IsHost"],
+        IsLatitude:     DefaultErrorMessages["IsLatitude"],
+        IsLogitude:     DefaultErrorMessages["IsLogitude"],
+        IsAlphaNum:     DefaultErrorMessages["IsAlphaNum"],
+        IsInRange:      DefaultErrorMessages["IsInRange"],
+        IsMinMaxLength: DefaultErrorMessages["IsMinMaxLength"],
+        IsMinLength:    DefaultErrorMessages["IsMinLength"],
+        IsMaxLength:    DefaultErrorMessages["IsMaxLength"],
+        IsIn:           DefaultErrorMessages["IsIn"],
+}
+
+var FieldLabels *Labels = &amp;Labels{}
+
+func SetMessages(v *Validations) <span class="cov8" title="1">{
+        errorMessages := map[string]string{}
+        bytes, _ := json.Marshal(v)
+        json.Unmarshal(bytes, &amp;errorMessages)
+        for key, value := range errorMessages </span><span class="cov8" title="1">{
+                if value == "" </span><span class="cov8" title="1">{
+                        errorMessages[key] = DefaultErrorMessages[key]
+                }</span>
+        }
+        <span class="cov8" title="1">bytes, _ = json.Marshal(errorMessages)
+        json.Unmarshal(bytes, Default)</span>
+}
+
+func SetFieldLables(l *Labels) <span class="cov8" title="1">{
+        FieldLabels = l
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package govalidityv
+
+import (
+        "encoding/json"
+        "errors"
+        "fmt"
+        "log"
+        "net"
+        "net/url"
+        "regexp"
+        "strconv"
+        "strings"
+        "unicode/utf8"
+
+        "github.com/hoitek-go/govalidity/govalidityconv"
+        "github.com/hoitek-go/govalidity/govaliditym"
+)
+
+func GetFieldLabelAndValue(field string, params []interface{}) (string, interface{}) <span class="cov8" title="1">{
+        fieldLabel := field
+        value := params[0]
+        label, ok := (*govaliditym.FieldLabels)[field]
+        if ok </span><span class="cov8" title="1">{
+                fieldLabel = label
+        }</span>
+        <span class="cov8" title="1">return fieldLabel, value</span>
+}
+
+func GetErrorMessageByFieldValue(baseErrorMessage string, field string, value interface{}) error <span class="cov8" title="1">{
+        errMessage := strings.ReplaceAll(baseErrorMessage, "{field}", field)
+        errMessage = strings.ReplaceAll(errMessage, "{value}", value.(string))
+        return errors.New(errMessage)
+}</span>
+
+func IsEmail(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsEmail, label, value)
+        str := value.(string)
+        rxEmail := regexp.MustCompile("^(((([a-zA-Z]|\\d|[!#\\$%&amp;'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])+(\\.([a-zA-Z]|\\d|[!#\\$%&amp;'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])+)*)|((\\x22)((((\\x20|\\x09)*(\\x0d\\x0a))?(\\x20|\\x09)+)?(([\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]|\\x21|[\\x23-\\x5b]|[\\x5d-\\x7e]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])|(\\([\\x01-\\x09\\x0b\\x0c\\x0d-\\x7f]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}]))))*(((\\x20|\\x09)*(\\x0d\\x0a))?(\\x20|\\x09)+)?(\\x22)))@((([a-zA-Z]|\\d|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])|(([a-zA-Z]|\\d|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])([a-zA-Z]|\\d|-|\\.|_|~|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])*([a-zA-Z]|\\d|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])))\\.)+(([a-zA-Z]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])|(([a-zA-Z]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])([a-zA-Z]|\\d|-|_|~|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])*([a-zA-Z]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])))\\.?$")
+        isValid := rxEmail.MatchString(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsRequired(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsRequired, label, value)
+        str := value.(string)
+        if strings.Trim(str, " ") == "" </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+        <span class="cov8" title="1">return true, nil</span>
+}
+
+func IsNumber(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsNumber, label, value)
+        number, numberError := govalidityconv.ToNumber(value)
+        if numberError != nil || number == nil </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+        <span class="cov8" title="1">return true, nil</span>
+}
+
+func IsUrl(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsUrl, label, value)
+        str := value.(string)
+        if str == "" || utf8.RuneCountInString(str) &gt;= 2083 || len(str) &lt;= 3 || strings.HasPrefix(str, ".") </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+        <span class="cov8" title="1">strTemp := str
+        if strings.Contains(str, ":") &amp;&amp; !strings.Contains(str, "://") </span><span class="cov8" title="1">{
+                strTemp = "http://" + str
+        }</span>
+        <span class="cov8" title="1">u, parseError := url.Parse(strTemp)
+        if parseError != nil </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+        <span class="cov8" title="1">if strings.HasPrefix(u.Host, ".") </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+        <span class="cov8" title="1">if u.Host == "" &amp;&amp; (u.Path != "" &amp;&amp; !strings.Contains(u.Path, ".")) </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+        <span class="cov8" title="1">var (
+                IP           string = `(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))`
+                URLSchema    string = `((ftp|tcp|udp|wss?|https?):\/\/)`
+                URLUsername  string = `(\S+(:\S*)?@)`
+                URLPath      string = `((\/|\?|#)[^\s]*)`
+                URLPort      string = `(:(\d{1,5}))`
+                URLIP        string = `([1-9]\d?|1\d\d|2[01]\d|22[0-3]|24\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){2}(?:\.([0-9]\d?|1\d\d|2[0-4]\d|25[0-5]))`
+                URLSubdomain string = `((www\.)|([a-zA-Z0-9]+([-_\.]?[a-zA-Z0-9])*[a-zA-Z0-9]\.[a-zA-Z0-9]+))`
+        )
+        rxURL := regexp.MustCompile(`^` + URLSchema + `?` + URLUsername + `?` + `((` + URLIP + `|(\[` + IP + `\])|(([a-zA-Z0-9]([a-zA-Z0-9-_]+)?[a-zA-Z0-9]([-\.][a-zA-Z0-9]+)*)|(` + URLSubdomain + `?))?(([a-zA-Z\x{00a1}-\x{ffff}0-9]+-?-?)*[a-zA-Z\x{00a1}-\x{ffff}0-9]+)(?:\.([a-zA-Z\x{00a1}-\x{ffff}]{1,}))?))\.?` + URLPort + `?` + URLPath + `?$`)
+        isValid := rxURL.MatchString(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsAlpha(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsAlpha, label, value)
+        str := value.(string)
+        rxAlpha := regexp.MustCompile("^[a-zA-Z]+$")
+        isValid := rxAlpha.MatchString(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsLowerCase(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsLowerCase, label, value)
+        str := value.(string)
+        isValid := str == strings.ToLower(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsUpperCase(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsUpperCase, label, value)
+        str := value.(string)
+        isValid := str == strings.ToUpper(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsInt(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsInt, label, value)
+        str := value.(string)
+        rxInt := regexp.MustCompile("^(?:[-+]?(?:0|[1-9][0-9]*))$")
+        isValid := rxInt.MatchString(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsFloat(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsFloat, label, value)
+        str := value.(string)
+        rxInt := regexp.MustCompile("^(?:[-+]?(?:[0-9]+))?(?:\\.[0-9]*)?(?:[eE][\\+\\-]?(?:[0-9]+))?$")
+        isValid := rxInt.MatchString(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsJson(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsJson, label, value)
+        str := value.(string)
+        var js json.RawMessage
+        isValid := json.Unmarshal([]byte(str), &amp;js) == nil
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsIp(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsIp, label, value)
+        str := value.(string)
+        isValid := net.ParseIP(str) != nil
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsIpV4(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsIpV4, label, value)
+        str := value.(string)
+        ip := net.ParseIP(str)
+        isValid := ip != nil &amp;&amp; strings.Contains(str, ".")
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsIpV6(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsIpV6, label, value)
+        str := value.(string)
+        ip := net.ParseIP(str)
+        isValid := ip != nil &amp;&amp; strings.Contains(str, ":")
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsPort(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsPort, label, value)
+        str := value.(string)
+        if i, err := strconv.Atoi(str); err == nil &amp;&amp; i &gt; 0 &amp;&amp; i &lt; 65536 </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsDNSName(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsDNSName, label, value)
+        str := value.(string)
+        if str == "" || len(strings.Replace(str, ".", "", -1)) &gt; 255 </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+        <span class="cov8" title="1">isIp, _ := IsIp(field, str)
+        rxDNSName := regexp.MustCompile(`^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`)
+        isValid := !isIp &amp;&amp; rxDNSName.MatchString(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsHost(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsHost, label, value)
+        str := value.(string)
+        isIp, _ := IsIp(field, str)
+        isDNSName, _ := IsDNSName(field, str)
+        isValid := isIp || isDNSName
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsLatitude(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsLatitude, label, value)
+        str := value.(string)
+        rxLatitude := regexp.MustCompile("^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)$")
+        isValid := rxLatitude.MatchString(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsLogitude(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsLogitude, label, value)
+        str := value.(string)
+        rxLogitude := regexp.MustCompile("^[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$")
+        isValid := rxLogitude.MatchString(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsAlphaNum(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        label, value := GetFieldLabelAndValue(field, params)
+        err := GetErrorMessageByFieldValue(govaliditym.Default.IsAlphaNum, label, value)
+        str := value.(string)
+        rxAlphaNum := regexp.MustCompile("^[a-zA-Z0-9]+$")
+        isValid := rxAlphaNum.MatchString(str)
+        if isValid </span><span class="cov8" title="1">{
+                return true, nil
+        }</span>
+        <span class="cov8" title="1">return false, err</span>
+}
+
+func IsInRange(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        fieldLabel := field
+        value := params[0].(string)
+        from := params[1].(int)
+        to := params[2].(int)
+
+        label, ok := (*govaliditym.FieldLabels)[field]
+        if ok </span><span class="cov8" title="1">{
+                fieldLabel = label
+        }</span>
+
+        <span class="cov8" title="1">errMessage := strings.ReplaceAll(govaliditym.Default.IsInRange, "{field}", fieldLabel)
+        errMessage = strings.ReplaceAll(errMessage, "{value}", value)
+        errMessage = strings.ReplaceAll(errMessage, "{from}", strconv.Itoa(from))
+        errMessage = strings.ReplaceAll(errMessage, "{to}", strconv.Itoa(to))
+        err := errors.New(errMessage)
+
+        valueNumber, errConv := strconv.Atoi(value)
+        if errConv != nil </span><span class="cov8" title="1">{
+                return false, errConv
+        }</span>
+        <span class="cov8" title="1">log.Println("asdasdasd", valueNumber)
+
+        if valueNumber &lt; from || valueNumber &gt; to </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov8" title="1">return true, nil</span>
+}
+
+func IsMinMaxLength(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        fieldLabel := field
+        value := params[0].(string)
+        min := params[1].(int)
+        max := params[2].(int)
+
+        label, ok := (*govaliditym.FieldLabels)[field]
+        if ok </span><span class="cov8" title="1">{
+                fieldLabel = label
+        }</span>
+
+        <span class="cov8" title="1">errMessage := strings.ReplaceAll(govaliditym.Default.IsMinMaxLength, "{field}", fieldLabel)
+        errMessage = strings.ReplaceAll(errMessage, "{value}", value)
+        errMessage = strings.ReplaceAll(errMessage, "{min}", strconv.Itoa(min))
+        errMessage = strings.ReplaceAll(errMessage, "{max}", strconv.Itoa(max))
+        err := errors.New(errMessage)
+
+        if len(value) &lt; min || len(value) &gt; max </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov8" title="1">return true, nil</span>
+}
+
+func IsMinLength(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        fieldLabel := field
+        value := params[0].(string)
+        min := params[1].(int)
+
+        label, ok := (*govaliditym.FieldLabels)[field]
+        if ok </span><span class="cov8" title="1">{
+                fieldLabel = label
+        }</span>
+
+        <span class="cov8" title="1">errMessage := strings.ReplaceAll(govaliditym.Default.IsMinLength, "{field}", fieldLabel)
+        errMessage = strings.ReplaceAll(errMessage, "{value}", value)
+        errMessage = strings.ReplaceAll(errMessage, "{min}", strconv.Itoa(min))
+        err := errors.New(errMessage)
+
+        if len(value) &lt; min </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov8" title="1">return true, nil</span>
+}
+
+func IsMaxLength(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        fieldLabel := field
+        value := params[0].(string)
+        max := params[1].(int)
+
+        label, ok := (*govaliditym.FieldLabels)[field]
+        if ok </span><span class="cov8" title="1">{
+                fieldLabel = label
+        }</span>
+
+        <span class="cov8" title="1">errMessage := strings.ReplaceAll(govaliditym.Default.IsMaxLength, "{field}", fieldLabel)
+        errMessage = strings.ReplaceAll(errMessage, "{value}", value)
+        errMessage = strings.ReplaceAll(errMessage, "{max}", strconv.Itoa(max))
+        err := errors.New(errMessage)
+
+        if len(value) &gt; max </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov8" title="1">return true, nil</span>
+}
+
+func IsIn(field string, params ...interface{}) (bool, error) <span class="cov8" title="1">{
+        fieldLabel := field
+        value := params[0].(string)
+        in := params[1].([]string)
+
+        label, ok := (*govaliditym.FieldLabels)[field]
+        if ok </span><span class="cov8" title="1">{
+                fieldLabel = label
+        }</span>
+
+        <span class="cov8" title="1">errMessage := strings.ReplaceAll(govaliditym.Default.IsIn, "{field}", fieldLabel)
+        errMessage = strings.ReplaceAll(errMessage, "{value}", value)
+        errMessage = strings.ReplaceAll(errMessage, "{in}", fmt.Sprintf("%v", in))
+        err := errors.New(errMessage)
+
+        found := false
+        for _, inVal := range in </span><span class="cov8" title="1">{
+                if value == inVal </span><span class="cov8" title="1">{
+                        found = true
+                        break</span>
+                }
+        }
+        <span class="cov8" title="1">if !found </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov8" title="1">return true, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
