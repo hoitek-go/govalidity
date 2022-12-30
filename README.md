@@ -194,7 +194,7 @@ So you can define optional fields in the schema like this:
 
 ~~~bash  
 schema := govalidity.Schema{
-    "ge": govalidity.New().Int(),
+    "age": govalidity.New().Int(),
 }
 ~~~
 
