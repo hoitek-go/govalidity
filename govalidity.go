@@ -2,9 +2,11 @@ package govalidity
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/hoitek-go/govalidity/govaliditybody"
+	"github.com/hoitek-go/govalidity/govalidityconv"
 	"github.com/hoitek-go/govalidity/govaliditym"
 	"github.com/hoitek-go/govalidity/govalidityv"
 )
@@ -273,7 +275,14 @@ func SetFieldLabels(l *govaliditym.Labels) {
 func (v *Validator) run() []error {
 	errs := []error{}
 	for _, validation := range v.Validations {
-		isValid, err := validation.Fn(v.Field, v.Value.(string))
+		number, errConv := govalidityconv.ToNumber(v.Value)
+		str := ""
+		if errConv == nil && number != nil {
+			str = fmt.Sprintf("%v", *number)
+		} else {
+			str = v.Value.(string)
+		}
+		isValid, err := validation.Fn(v.Field, str)
 		if !isValid {
 			errs = append(errs, err)
 		}

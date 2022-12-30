@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"net/url"
 	"regexp"
@@ -284,7 +283,7 @@ func IsAlphaNum(field string, params ...interface{}) (bool, error) {
 
 func IsInRange(field string, params ...interface{}) (bool, error) {
 	fieldLabel := field
-	value := params[0].(string)
+	dataValue := params[0]
 	from := params[1].(int)
 	to := params[2].(int)
 
@@ -293,19 +292,23 @@ func IsInRange(field string, params ...interface{}) (bool, error) {
 		fieldLabel = label
 	}
 
+	value := ""
+	number, errConv := govalidityconv.ToNumber(dataValue)
+	if errConv == nil && number != nil {
+		value = fmt.Sprintf("%v", *number)
+	}
+
 	errMessage := strings.ReplaceAll(govaliditym.Default.IsInRange, "{field}", fieldLabel)
 	errMessage = strings.ReplaceAll(errMessage, "{value}", value)
 	errMessage = strings.ReplaceAll(errMessage, "{from}", strconv.Itoa(from))
 	errMessage = strings.ReplaceAll(errMessage, "{to}", strconv.Itoa(to))
 	err := errors.New(errMessage)
 
-	valueNumber, errConv := strconv.Atoi(value)
-	if errConv != nil {
-		return false, errConv
+	if number == nil {
+		return false, err
 	}
-	log.Println("asdasdasd", valueNumber)
 
-	if valueNumber < from || valueNumber > to {
+	if int(*number) < from || int(*number) > to {
 		return false, err
 	}
 
@@ -314,13 +317,21 @@ func IsInRange(field string, params ...interface{}) (bool, error) {
 
 func IsMinMaxLength(field string, params ...interface{}) (bool, error) {
 	fieldLabel := field
-	value := params[0].(string)
+	dataValue := params[0]
 	min := params[1].(int)
 	max := params[2].(int)
 
 	label, ok := (*govaliditym.FieldLabels)[field]
 	if ok {
 		fieldLabel = label
+	}
+
+	value := ""
+	number, errConv := govalidityconv.ToNumber(dataValue)
+	if errConv == nil && number != nil {
+		value = fmt.Sprintf("%v", *number)
+	} else {
+		value = dataValue.(string)
 	}
 
 	errMessage := strings.ReplaceAll(govaliditym.Default.IsMinMaxLength, "{field}", fieldLabel)
@@ -338,12 +349,20 @@ func IsMinMaxLength(field string, params ...interface{}) (bool, error) {
 
 func IsMinLength(field string, params ...interface{}) (bool, error) {
 	fieldLabel := field
-	value := params[0].(string)
+	dataValue := params[0]
 	min := params[1].(int)
 
 	label, ok := (*govaliditym.FieldLabels)[field]
 	if ok {
 		fieldLabel = label
+	}
+
+	value := ""
+	number, errConv := govalidityconv.ToNumber(dataValue)
+	if errConv == nil && number != nil {
+		value = fmt.Sprintf("%v", *number)
+	} else {
+		value = dataValue.(string)
 	}
 
 	errMessage := strings.ReplaceAll(govaliditym.Default.IsMinLength, "{field}", fieldLabel)
@@ -360,12 +379,20 @@ func IsMinLength(field string, params ...interface{}) (bool, error) {
 
 func IsMaxLength(field string, params ...interface{}) (bool, error) {
 	fieldLabel := field
-	value := params[0].(string)
+	dataValue := params[0]
 	max := params[1].(int)
 
 	label, ok := (*govaliditym.FieldLabels)[field]
 	if ok {
 		fieldLabel = label
+	}
+
+	value := ""
+	number, errConv := govalidityconv.ToNumber(dataValue)
+	if errConv == nil && number != nil {
+		value = fmt.Sprintf("%v", *number)
+	} else {
+		value = dataValue.(string)
 	}
 
 	errMessage := strings.ReplaceAll(govaliditym.Default.IsMaxLength, "{field}", fieldLabel)
@@ -382,12 +409,20 @@ func IsMaxLength(field string, params ...interface{}) (bool, error) {
 
 func IsIn(field string, params ...interface{}) (bool, error) {
 	fieldLabel := field
-	value := params[0].(string)
+	dataValue := params[0]
 	in := params[1].([]string)
 
 	label, ok := (*govaliditym.FieldLabels)[field]
 	if ok {
 		fieldLabel = label
+	}
+
+	value := ""
+	number, errConv := govalidityconv.ToNumber(dataValue)
+	if errConv == nil && number != nil {
+		value = fmt.Sprintf("%v", *number)
+	} else {
+		value = dataValue.(string)
 	}
 
 	errMessage := strings.ReplaceAll(govaliditym.Default.IsIn, "{field}", fieldLabel)
