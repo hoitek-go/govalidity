@@ -402,3 +402,33 @@ func TestGetBodyFromJson(t *testing.T) {
 		}
 	})
 }
+
+func TestDumpErrors(t *testing.T) {
+	errs := ValidationErrors{
+		"name": []error{
+			errors.New("error 1"),
+			errors.New("error 2"),
+		},
+	}
+	dumpedErrs := DumpError(errs)
+	if len(dumpedErrs) <= 0 {
+		t.Error("result can not be empty")
+	}
+	nameErrs, ok := dumpedErrs["name"]
+	if !ok {
+		t.Error("result is not the same as input errors")
+	}
+	if len(nameErrs) != 2 {
+		t.Error("result is not the same as input errors")
+	}
+	resultIsValid := true
+	for _, nameErr := range nameErrs {
+		if nameErr != "error 1" && nameErr != "error 2" {
+			resultIsValid = false
+			break
+		}
+	}
+	if !resultIsValid {
+		t.Error("result is not the same as input errors")
+	}
+}

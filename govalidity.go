@@ -13,6 +13,7 @@ import (
 
 type Schema = map[string]*Validator
 type ValidationErrors = map[string][]error
+type ValidityResponseErrors = map[string][]string
 type Body = map[string]interface{}
 
 type FuncSchema struct {
@@ -300,4 +301,14 @@ func GetBodyFromJson(dataMap Body, result interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func DumpError(errs ValidationErrors) ValidityResponseErrors {
+	errMap := map[string][]string{}
+	for k, vErrs := range errs {
+		for _, e := range vErrs {
+			errMap[k] = append(errMap[k], e.Error())
+		}
+	}
+	return errMap
 }
