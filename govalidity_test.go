@@ -374,9 +374,9 @@ func TestSetFieldLabels(t *testing.T) {
 func TestGetBodyFromJson(t *testing.T) {
 	t.Run("dataMap invalid type", func(t *testing.T) {
 		var v Body
-		err := GetBodyFromJson(Body{
+		err := GetBodyFromJson(&v, Body{
 			"test": make(chan int),
-		}, &v)
+		})
 		if err == nil {
 			t.Error("should return error")
 		}
@@ -384,9 +384,9 @@ func TestGetBodyFromJson(t *testing.T) {
 
 	t.Run("result is nil", func(t *testing.T) {
 		var test *int = nil
-		err := GetBodyFromJson(Body{
+		err := GetBodyFromJson(test, Body{
 			"test": "ok",
-		}, test)
+		})
 		if err == nil {
 			t.Error("should return error")
 		}
@@ -394,9 +394,9 @@ func TestGetBodyFromJson(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		var v Body
-		err := GetBodyFromJson(Body{
+		err := GetBodyFromJson(&v, Body{
 			"test": "ok",
-		}, &v)
+		})
 		if err != nil {
 			t.Error(err)
 		}
@@ -410,7 +410,7 @@ func TestDumpErrors(t *testing.T) {
 			errors.New("error 2"),
 		},
 	}
-	dumpedErrs := DumpError(errs)
+	dumpedErrs := DumpErrors(errs)
 	if len(dumpedErrs) <= 0 {
 		t.Error("result can not be empty")
 	}

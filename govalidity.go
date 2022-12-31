@@ -291,7 +291,7 @@ func (v *Validator) run() []error {
 	return errs
 }
 
-func GetBodyFromJson(dataMap Body, result interface{}) error {
+func GetBodyFromJson(result interface{}, dataMap Body) error {
 	bytes, err := json.Marshal(dataMap)
 	if err != nil {
 		return err
@@ -303,7 +303,7 @@ func GetBodyFromJson(dataMap Body, result interface{}) error {
 	return nil
 }
 
-func DumpError(errs ValidationErrors) ValidityResponseErrors {
+func DumpErrors(errs ValidationErrors) ValidityResponseErrors {
 	errMap := map[string][]string{}
 	for k, vErrs := range errs {
 		for _, e := range vErrs {
