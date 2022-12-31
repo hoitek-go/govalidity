@@ -236,7 +236,7 @@ func (v *Validator) Logitude() *Validator <span class="cov8" title="1">{
         return v
 }</span>
 
-func (v *Validator) AlpaNum() *Validator <span class="cov8" title="1">{
+func (v *Validator) AlphaNum() *Validator <span class="cov8" title="1">{
         v.Validations = append(v.Validations, FuncSchema{
                 Fn: govalidityv.IsAlphaNum,
         })

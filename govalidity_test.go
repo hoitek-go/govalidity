@@ -169,11 +169,11 @@ func TestLogitude(t *testing.T) {
 	}
 }
 
-func TestAlpaNum(t *testing.T) {
+func TestAlphaNum(t *testing.T) {
 	v := New()
-	v.AlpaNum()
+	v.AlphaNum()
 	if len(v.Validations) <= 0 {
-		t.Error("AlpaNum validator should be set in validations")
+		t.Error("AlphaNum validator should be set in validations")
 	}
 }
 

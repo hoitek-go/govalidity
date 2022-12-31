@@ -160,7 +160,7 @@ func (v *Validator) Logitude() *Validator {
 	return v
 }
 
-func (v *Validator) AlpaNum() *Validator {
+func (v *Validator) AlphaNum() *Validator {
 	v.Validations = append(v.Validations, FuncSchema{
 		Fn: govalidityv.IsAlphaNum,
 	})
