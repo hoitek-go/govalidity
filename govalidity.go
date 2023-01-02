@@ -11,10 +11,13 @@ import (
 	"github.com/hoitek-go/govalidity/govalidityv"
 )
 
-type Schema = map[string]*Validator
-type ValidationErrors = map[string][]error
-type ValidityResponseErrors = map[string][]string
-type Body = map[string]interface{}
+type (
+	Schema                 = map[string]*Validator
+	ValidationErrors       = map[string][]error
+	ValidityResponseErrors = map[string][]string
+	Body                   = map[string]interface{}
+	Params                 = map[string]string
+)
 
 type FuncSchema struct {
 	Fn func(string, ...interface{}) (bool, error)
@@ -240,6 +243,69 @@ func ValidateBody(r *http.Request, validations Schema) (bool, ValidationErrors, 
 				err,
 			},
 		}, nil
+	}
+	validationErrors := ValidationErrors{}
+	isValid := true
+	for k, v := range validations {
+		value, ok := dataMap[k]
+		if !ok {
+			value = ""
+			if v.DefaultValue != "" {
+				value = v.DefaultValue
+				dataMap[k] = value
+			}
+		}
+		v.Field = k
+		v.Value = value
+		errs := v.run()
+		if len(errs) > 0 {
+			isValid = false
+		}
+		if len(errs) > 0 {
+			validationErrors[v.Field] = errs
+		}
+	}
+	return isValid, validationErrors, dataMap
+}
+
+func ValidateParams(params Params, validations Schema) (bool, ValidationErrors, Body) {
+	dataMap := Body{}
+
+	for k, v := range params {
+		dataMap[k] = v
+	}
+
+	validationErrors := ValidationErrors{}
+	isValid := true
+	for k, v := range validations {
+		value, ok := dataMap[k]
+		if !ok {
+			value = ""
+			if v.DefaultValue != "" {
+				value = v.DefaultValue
+				dataMap[k] = value
+			}
+		}
+		v.Field = k
+		v.Value = value
+		errs := v.run()
+		if len(errs) > 0 {
+			isValid = false
+		}
+		if len(errs) > 0 {
+			validationErrors[v.Field] = errs
+		}
+	}
+	return isValid, validationErrors, dataMap
+}
+
+func ValidateQueries(r *http.Request, validations Schema) (bool, ValidationErrors, Body) {
+	dataMap := Body{}
+	queries := r.URL.Query()
+	for k, v := range queries {
+		if len(queries) > 0 {
+			dataMap[k] = v[0]
+		}
 	}
 	validationErrors := ValidationErrors{}
 	isValid := true
