@@ -352,6 +352,30 @@ func TestValidateBody(t *testing.T) {
 	})
 }
 
+func TestValidateQueries(t *testing.T) {
+	t.Run("QueriesIsNotPrepare", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/", errReader(0))
+		schema := Schema{
+			"email": New().Email().Required(),
+		}
+		isValid, _, _ := ValidateQueries(r, schema)
+		if isValid {
+			t.Error("Should throw error when body is not prepare")
+		}
+	})
+
+	t.Run("QueriesIsPrepare", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/?email=value@email.com", errReader(0))
+		schema := Schema{
+			"email": New().Email().MinLength(5).Required(),
+		}
+		isValid, _, _ := ValidateQueries(r, schema)
+		if !isValid {
+			t.Error("should be valid")
+		}
+	})
+}
+
 func TestSetDefaultErrorMessages(t *testing.T) {
 	SetDefaultErrorMessages(&govaliditym.Validations{
 		IsEmail: "test",

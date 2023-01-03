@@ -16,6 +16,7 @@ type (
 	ValidationErrors       = map[string][]error
 	ValidityResponseErrors = map[string][]string
 	Body                   = map[string]interface{}
+	Queries                = map[string]interface{}
 	Params                 = map[string]string
 )
 
@@ -299,8 +300,8 @@ func ValidateParams(params Params, validations Schema) (bool, ValidationErrors, 
 	return isValid, validationErrors, dataMap
 }
 
-func ValidateQueries(r *http.Request, validations Schema) (bool, ValidationErrors, Body) {
-	dataMap := Body{}
+func ValidateQueries(r *http.Request, validations Schema) (bool, ValidationErrors, Queries) {
+	dataMap := Queries{}
 	queries := r.URL.Query()
 	for k, v := range queries {
 		if len(queries) > 0 {
@@ -358,6 +359,30 @@ func (v *Validator) run() []error {
 }
 
 func GetBodyFromJson(result interface{}, dataMap Body) error {
+	bytes, err := json.Marshal(dataMap)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(bytes, result)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetQueriesFromJson(result interface{}, dataMap Queries) error {
+	bytes, err := json.Marshal(dataMap)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(bytes, result)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetParamsFromJson(result interface{}, dataMap Params) error {
 	bytes, err := json.Marshal(dataMap)
 	if err != nil {
 		return err
