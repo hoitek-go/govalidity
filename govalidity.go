@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	Schema                 = map[string]*Validator
+	Schema                 = map[string]interface{}
 	ValidationErrors       = map[string][]error
 	ValidityResponseErrors = map[string][]string
 	Body                   = map[string]interface{}
@@ -32,8 +32,9 @@ type Validator struct {
 	Validations  []FuncSchema
 }
 
-func New() *Validator {
+func New(label string) *Validator {
 	return &Validator{
+		Field:       label,
 		Validations: []FuncSchema{},
 	}
 }
@@ -216,6 +217,15 @@ func (v *Validator) In(in []string) *Validator {
 	return v
 }
 
+func (v *Validator) FilterOperators(operators ...string) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.FilterOperators(f, v.Value, operators)
+		},
+	})
+	return v
+}
+
 func (v *Validator) CustomValidator(fn func(string, ...interface{}) (bool, error)) *Validator {
 	v.Validations = append(v.Validations, FuncSchema{
 		Fn: func(f string, i ...interface{}) (bool, error) {
@@ -235,7 +245,9 @@ func (v *Validator) Default(value string) *Validator {
 	return v
 }
 
-func ValidateBody(r *http.Request, validations Schema) (bool, ValidationErrors, Body) {
+func ValidateBody(r *http.Request, validations Schema, structData interface{}) (bool, ValidationErrors) {
+	validationErrors = ValidationErrors{}
+
 	var dataMap Body
 	err := govaliditybody.Bind(r, &dataMap)
 	if err != nil {
@@ -243,93 +255,105 @@ func ValidateBody(r *http.Request, validations Schema) (bool, ValidationErrors, 
 			"UnknownError": []error{
 				err,
 			},
-		}, nil
+		}
 	}
-	validationErrors := ValidationErrors{}
-	isValid := true
-	for k, v := range validations {
-		value, ok := dataMap[k]
-		if !ok {
-			value = ""
-			if v.DefaultValue != "" {
-				value = v.DefaultValue
-				dataMap[k] = value
+	for k, v := range dataMap {
+		switch v.(type) {
+		case string:
+			if isJson(v.(string)) {
+				dataMap[k] = `{"` + k + `":` + v.(string) + `}`
+			} else {
+				dataMap[k] = v.(string)
 			}
 		}
-		v.Field = k
-		v.Value = value
-		errs := v.run()
-		if len(errs) > 0 {
-			isValid = false
-		}
-		if len(errs) > 0 {
-			validationErrors[v.Field] = errs
-		}
 	}
-	return isValid, validationErrors, dataMap
+
+	return validateByJson(dataMap, validations, structData)
 }
 
-func ValidateParams(params Params, validations Schema) (bool, ValidationErrors, Body) {
+func ValidateParams(params Params, validations Schema, structData interface{}) (bool, ValidationErrors) {
 	dataMap := Body{}
 
 	for k, v := range params {
-		dataMap[k] = v
+		if isJson(v) {
+			dataMap[k] = `{"` + k + `":` + v + `}`
+		} else {
+			dataMap[k] = v
+		}
 	}
 
-	validationErrors := ValidationErrors{}
+	return validateByJson(dataMap, validations, structData)
+}
+
+func isJson(s string) bool {
+	var j map[string]interface{}
+	if err := json.Unmarshal([]byte(s), &j); err != nil {
+		return false
+	}
+	return true
+}
+
+func convertToMap(s string) map[string]interface{} {
+	var j map[string]interface{}
+	if err := json.Unmarshal([]byte(s), &j); err != nil {
+		return nil
+	}
+	return j
+}
+
+var validationErrors = ValidationErrors{}
+
+func validateByJson(dataMap map[string]interface{}, validations Schema, structData interface{}) (bool, ValidationErrors) {
 	isValid := true
 	for k, v := range validations {
 		value, ok := dataMap[k]
 		if !ok {
 			value = ""
-			if v.DefaultValue != "" {
-				value = v.DefaultValue
-				dataMap[k] = value
+			switch v.(type) {
+			case *Validator:
+				if v.(*Validator).DefaultValue != "" {
+					value = v.(*Validator).DefaultValue
+					dataMap[k] = value
+				}
 			}
 		}
-		v.Field = k
-		v.Value = value
-		errs := v.run()
-		if len(errs) > 0 {
-			isValid = false
-		}
-		if len(errs) > 0 {
-			validationErrors[v.Field] = errs
+		switch v.(type) {
+		case Schema:
+			valueStr := fmt.Sprintf("%s", value)
+			temp := map[string]interface{}{}
+			if isJson(valueStr) {
+				jsonData := convertToMap(valueStr)
+				jsn := jsonData[k]
+				validateByJson(jsn.(map[string]interface{}), v.(Schema), &temp)
+			} else {
+				validateByJson(value.(map[string]interface{}), v.(Schema), &temp)
+			}
+		case *Validator:
+			v.(*Validator).Value = value
+			errs := v.(*Validator).run()
+			if len(errs) > 0 {
+				isValid = false
+				validationErrors[v.(*Validator).Field] = errs
+			}
 		}
 	}
-	return isValid, validationErrors, dataMap
+	return isValid, validationErrors
 }
 
-func ValidateQueries(r *http.Request, validations Schema) (bool, ValidationErrors, Queries) {
+func ValidateQueries(r *http.Request, validations Schema, structData interface{}) (bool, ValidationErrors) {
+	validationErrors = ValidationErrors{}
 	dataMap := Queries{}
 	queries := r.URL.Query()
 	for k, v := range queries {
 		if len(queries) > 0 {
-			dataMap[k] = v[0]
-		}
-	}
-	validationErrors := ValidationErrors{}
-	isValid := true
-	for k, v := range validations {
-		value, ok := dataMap[k]
-		if !ok {
-			value = ""
-			if v.DefaultValue != "" {
-				value = v.DefaultValue
-				dataMap[k] = value
+			if isJson(v[0]) {
+				dataMap[k] = `{"` + k + `":` + v[0] + `}`
+			} else {
+				dataMap[k] = v[0]
 			}
 		}
-		v.Field = k
-		v.Value = value
-		errs := v.run()
-		if len(errs) > 0 {
-			isValid = false
-		}
-		if len(errs) > 0 {
-			validationErrors[v.Field] = errs
-		}
 	}
-	return isValid, validationErrors, dataMap
+	return validateByJson(dataMap, validations, structData)
 }
 
 func SetDefaultErrorMessages(v *govaliditym.Validations) {
@@ -356,42 +380,6 @@ func (v *Validator) run() []error {
 		}
 	}
 	return errs
-}
-
-func GetBodyFromJson(result interface{}, dataMap Body) error {
-	bytes, err := json.Marshal(dataMap)
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal(bytes, result)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func GetQueriesFromJson(result interface{}, dataMap Queries) error {
-	bytes, err := json.Marshal(dataMap)
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal(bytes, result)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func GetParamsFromJson(result interface{}, dataMap Params) error {
-	bytes, err := json.Marshal(dataMap)
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal(bytes, result)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func DumpErrors(errs ValidationErrors) ValidityResponseErrors {

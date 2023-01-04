@@ -8,6 +8,9 @@ With this package you can validate your request easy peasy!
 ## Features 🔥
 - Use validation easily in your model based on struct
 - Custom validation support
+- Nested Validation Support
+- Router Queries Validation Support
+- Router Params Validation Support
 - i18n support for default error messages
 - i18n support for field names
 - i18n globally support
@@ -48,17 +51,17 @@ type UserIndexRequest struct {
 	FilterPage json.Number `json:"filter[page]"`
 }
 
-func (b *UserIndexRequest) ValidateBody(r *http.Request) (bool, govalidity.ValidationErrors, govalidity.Body) {
+func (data *UserIndexRequest) ValidateBody(r *http.Request) (bool, govalidity.ValidationErrors) {
 	schema := govalidity.Schema{
-		"email":        govalidity.New().Email().Required(),
-		"name":         govalidity.New().LowerCase().In([]string{"saeed", "taher"}).Required(),
-		"age":          govalidity.New().Number().Required(),
-		"url":          govalidity.New().Url().Required(),
-		"json":         govalidity.New().Json(),
-		"ip":           govalidity.New().Ip().Required(),
-		"filter[page]": govalidity.New().Int().InRange(10, 20).Required(),
+		"email":        govalidity.New("email").Email().Required(),
+		"name":         govalidity.New("name").LowerCase().In([]string{"saeed", "taher"}).Required(),
+		"age":          govalidity.New("age").Number().Required(),
+		"url":          govalidity.New("url").Url().Required(),
+		"json":         govalidity.New("json").Json(),
+		"ip":           govalidity.New("ip").Ip().Required(),
+		"filter[page]": govalidity.New("filterPage).Int().InRange(10, 20).Required(),
 	}
-	return govalidity.ValidateBody(r, schema)
+	return govalidity.ValidateBody(r, schema, &data)
 }
 ~~~ 
 
@@ -79,14 +82,9 @@ import (
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data := &models.UserIndexRequest{}
-		isValid, err, json := data.ValidateBody(r)
+		isValid, err := data.ValidateBody(r)
 		if !isValid {
 			log.Println(err)
-			return
-		}
-		bodyErr := govalidity.GetBodyFromJson(json, data)
-		if bodyErr != nil {
-			log.Println(bodyErr)
 			return
 		}
 		log.Printf("%#v\n", data)
@@ -95,7 +93,100 @@ func main() {
 }
 ~~~ 
 
-## Translate Default Error Messages:
+## Nested Validation
+
+You can use nested struct as validation. for example:
+
+**Sample Schema:**
+
+~~~go  
+
+type FilterValue[T string | int] struct {
+    Op    string `json:"op"`
+    Value T      `json:"value"`
+}
+
+type FilterType struct {
+    Name FilterValue[string] `json:"name"`
+    Age  FilterValue[int]    `json:"age"`
+}
+
+type Query struct {
+    Email  string     `json:"email"`
+    Filter FilterType `json:"filter"`
+}
+
+schema := Schema{
+    "email": New("email").Email().Required(),
+    "filter": Schema{
+        "name": Schema{
+            "op":    New("filter.name.op").Alpha().FilterOperators().Required(),
+            "value": New("filter.name.value").Alpha().Required(),
+        },
+        "age": Schema{
+            "op":    New("filter.age.op").Alpha().Required(),
+            "value": New("filter.age.value").Alpha().Required(),
+        },
+    },
+}
+
+~~~ 
+
+## Router Queries Validation
+
+You can use govalidity for router queries. 
+
+After you create the schema, just call ValidateQueries()
+
+For example:
+
+**Sample Schema:**
+
+~~~go  
+type FilterValue[T string | int] struct {
+    Op    string `json:"op"`
+    Value T      `json:"value"`
+}
+
+type FilterType struct {
+    Name FilterValue[string] `json:"name"`
+    Age  FilterValue[int]    `json:"age"`
+}
+
+type Query struct {
+    Email  string     `json:"email"`
+    Filter FilterType `json:"filter"`
+}
+
+schema := Schema{
+    "email": New("email").Email().Required(),
+    "filter": Schema{
+        "name": Schema{
+            "op":    New("filter.name.op").Alpha().FilterOperators().Required(),
+            "value": New("filter.name.value").Alpha().Required(),
+        },
+        "age": Schema{
+            "op":    New("filter.age.op").Alpha().Required(),
+            "value": New("filter.age.value").Alpha().Required(),
+        },
+    },
+}
+
+func (data *Query) ValidateBody(r *http.Request) (bool, govalidity.ValidationErrors) {
+	schema := govalidity.Schema{
+		"email":        govalidity.New("email").Email().Required(),
+		"name":         govalidity.New("name").LowerCase().In([]string{"saeed", "taher"}).Required(),
+		"age":          govalidity.New("age").Number().Required(),
+		"url":          govalidity.New("url").Url().Required(),
+		"json":         govalidity.New("json").Json(),
+		"ip":           govalidity.New("ip").Ip().Required(),
+		"filter[page]": govalidity.New("filterPage).Int().InRange(10, 20).Required(),
+	}
+	return govalidity.ValidateQueries(r, schema, &data)
+}
+~~~ 
+
+## Translate Default Error Messages
 
 You can change default error messages globally or in your model.
 
@@ -225,6 +316,7 @@ MinMaxLength(min, max int)
 MinLength(min int)
 MaxLength(max int)
 In(in []string)
+FilterOperators()
 ~~~
 
 ## Run Tests
