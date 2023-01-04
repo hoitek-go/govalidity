@@ -6,18 +6,18 @@
 With this package you can validate your request easy peasy!
 
 ## Features 🔥
-- Use validation easily in your model based on struct
-- Custom validation support
+- Use Validation Easily In Your Model Based On Struct
+- Custom Validation Support
 - Nested Validation Support
 - Router Queries Validation Support
 - Router Params Validation Support
-- i18n support for default error messages
-- i18n support for field names
-- i18n globally support
-- i18n per model support
-- Automatically parse body to struct when data is valid
-- Simple usage
-- 100% test coverage
+- i18n Support For Default Error Messages
+- i18n Support For Field Names
+- i18n Globally Support
+- i18n Per Model Support
+- Automatically Parse Body To Struct When Data is Valid
+- Simple Usage
+- 100% Test Coverage
 
 ## Installation 
 Run the following comand in your project
@@ -100,7 +100,6 @@ You can use nested struct as validation. for example:
 **Sample Schema:**
 
 ~~~go  
-
 type FilterValue[T string | int] struct {
     Op    string `json:"op"`
     Value T      `json:"value"`
@@ -116,20 +115,19 @@ type Query struct {
     Filter FilterType `json:"filter"`
 }
 
-schema := Schema{
+schema := govalidity.Schema{
     "email": New("email").Email().Required(),
-    "filter": Schema{
-        "name": Schema{
+    "filter": govalidity.Schema{
+        "name": govalidity.Schema{
             "op":    New("filter.name.op").Alpha().FilterOperators().Required(),
             "value": New("filter.name.value").Alpha().Required(),
         },
-        "age": Schema{
+        "age": govalidity.Schema{
             "op":    New("filter.age.op").Alpha().Required(),
             "value": New("filter.age.value").Alpha().Required(),
         },
     },
 }
-
 ~~~ 
 
 ## Router Queries Validation
@@ -158,21 +156,7 @@ type Query struct {
     Filter FilterType `json:"filter"`
 }
 
-schema := Schema{
-    "email": New("email").Email().Required(),
-    "filter": Schema{
-        "name": Schema{
-            "op":    New("filter.name.op").Alpha().FilterOperators().Required(),
-            "value": New("filter.name.value").Alpha().Required(),
-        },
-        "age": Schema{
-            "op":    New("filter.age.op").Alpha().Required(),
-            "value": New("filter.age.value").Alpha().Required(),
-        },
-    },
-}
-
-func (data *Query) ValidateBody(r *http.Request) (bool, govalidity.ValidationErrors) {
+func (data *Query) ValidateQueries(r *http.Request) (bool, govalidity.ValidationErrors) {
 	schema := govalidity.Schema{
 		"email":        govalidity.New("email").Email().Required(),
 		"name":         govalidity.New("name").LowerCase().In([]string{"saeed", "taher"}).Required(),
@@ -183,6 +167,29 @@ func (data *Query) ValidateBody(r *http.Request) (bool, govalidity.ValidationErr
 		"filter[page]": govalidity.New("filterPage).Int().InRange(10, 20).Required(),
 	}
 	return govalidity.ValidateQueries(r, schema, &data)
+}
+~~~ 
+
+## Router Params Validation
+
+You can use govalidity for router params. 
+
+After you create the schema, just call ValidateParams()
+
+For example:
+
+**Sample Schema:**
+
+~~~go  
+type Query struct {
+    Email  string     `json:"email"`
+}
+
+func (data *Query) ValidateParams(params govalidity.Params) (bool, govalidity.ValidationErrors) {
+	schema := govalidity.Schema{
+		"email":        govalidity.New("email").Email().Required(),
+	}
+	return govalidity.ValidateParams(params, schema, &data)
 }
 ~~~ 
 
