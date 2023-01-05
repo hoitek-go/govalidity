@@ -324,21 +324,23 @@ func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]inter
 			}
 		}
 	}
-	baseDataMap = sanitizeDataMapToJson(baseDataMap)
-	bytes, err := json.Marshal(baseDataMap)
-	if err != nil {
-		return false, ValidationErrors{
-			"error": {
-				errors.New("Input Data is Invalid"),
-			},
+	if isValid {
+		baseDataMap = sanitizeDataMapToJson(baseDataMap)
+		bytes, err := json.Marshal(baseDataMap)
+		if err != nil {
+			return false, ValidationErrors{
+				"error": {
+					errors.New("Input Data is Invalid"),
+				},
+			}
 		}
-	}
-	err = json.Unmarshal(bytes, &structData)
-	if err != nil {
-		return false, ValidationErrors{
-			"error": {
-				errors.New("Input Data is Invalid"),
-			},
+		err = json.Unmarshal(bytes, &structData)
+		if err != nil {
+			return false, ValidationErrors{
+				"error": {
+					errors.New("Input Data is Invalid"),
+				},
+			}
 		}
 	}
 	return isValid, validationErrors

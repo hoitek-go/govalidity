@@ -3,6 +3,7 @@ package govalidity
 import (
 	"errors"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -404,7 +405,7 @@ func TestValidateQueries(t *testing.T) {
 	})
 
 	t.Run("tsetsetset", func(t *testing.T) {
-		r := httptest.NewRequest(http.MethodGet, `/?email=sgh370@yahoo.com&filter={"email":{"op":"equal","value":"sgh370@yahoo.com"},"name":{"op":"equal","value":"saeed"},"lastName":{"op":"equal","value":"ghanbari"},"userName":{"op":"equal","value":"sgh370"},"nationalCode":{"op":"equal","value":"0720464201"},"birthdate":{"op":"equal","value":"a"},"avatarUrl":{"op":"equal","value":"a"},"suspended_at":{"op":"equal","value":"a"},"created_at":{"op":"equal","value":"a"}}`, errReader(0))
+		r := httptest.NewRequest(http.MethodGet, `/?email=sgh370@yahoo.com&filter={"phone":{"op":"equal","value":1},"email":{"op":"equal","value":"sgh370@yahoo.com"},"name":{"op":"equal","value":"saeed"},"lastName":{"op":"equal","value":"ghanbari"},"userName":{"op":"equal","value":"sgh370"},"nationalCode":{"op":"equal","value":"0720464201"},"birthdate":{"op":"equal","value":"a"},"avatarUrl":{"op":"equal","value":"a"},"suspended_at":{"op":"equal","value":"a"},"created_at":{"op":"equal","value":"a"}}`, errReader(0))
 
 		type FilterValue[T string | int] struct {
 			Op    string `json:"op,omitempty"`
@@ -437,12 +438,19 @@ func TestValidateQueries(t *testing.T) {
 			"filter": Schema{
 				"phone": Schema{
 					"op":    New("filter.phone.op").Required(),
-					"value": New("filter.phone.value").Required(),
+					"value": New("filter.phone.value").Int().Required(),
 				},
 			},
 		}
 
-		isValid, _ := ValidateQueries(r, schema, q)
+		isValid, errs := ValidateQueries(r, schema, q)
+		if !isValid {
+			for _, errss := range errs {
+				for _, err := range errss {
+					log.Printf("aaaaaaaaaaaaaaaaaa %#v\n", err.Error())
+				}
+			}
+		}
 		if !isValid {
 			t.Error("should be valid")
 		}
