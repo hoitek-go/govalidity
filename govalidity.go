@@ -270,6 +270,19 @@ func convertToJson(i interface{}) string {
 	return string(bytes)
 }
 
+func sanitizeDataMapToJson(dataMap map[string]interface{}) map[string]interface{} {
+	for k, v := range dataMap {
+		switch v.(type) {
+		case string:
+			if isJson(v.(string)) {
+				dataMap[k] = convertToMap(v.(string))
+				sanitizeDataMapToJson(dataMap[k].(map[string]interface{}))
+			}
+		}
+	}
+	return dataMap
+}
+
 var validationErrors = ValidationErrors{}
 
 func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]interface{}, validations Schema, structData interface{}) (bool, ValidationErrors) {
@@ -292,10 +305,15 @@ func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]inter
 			temp := map[string]interface{}{}
 			if isJson(valueStr) {
 				jsonData := convertToMap(valueStr)
-				jsn := jsonData[k]
-				validateByJson(baseDataMap, jsn.(map[string]interface{}), v.(Schema), &temp)
+				jsn, ok := jsonData[k]
+				if ok {
+					validateByJson(baseDataMap, jsn.(Schema), v.(Schema), &temp)
+				}
 			} else {
-				validateByJson(baseDataMap, value.(map[string]interface{}), v.(Schema), &temp)
+				switch value.(type) {
+				case Schema:
+					validateByJson(baseDataMap, value.(Schema), v.(Schema), &temp)
+				}
 			}
 		case *Validator:
 			v.(*Validator).Value = value
@@ -306,6 +324,7 @@ func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]inter
 			}
 		}
 	}
+	baseDataMap = sanitizeDataMapToJson(baseDataMap)
 	bytes, err := json.Marshal(baseDataMap)
 	if err != nil {
 		return false, ValidationErrors{

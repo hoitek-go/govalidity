@@ -404,42 +404,47 @@ func TestValidateQueries(t *testing.T) {
 	})
 
 	t.Run("tsetsetset", func(t *testing.T) {
-		r := httptest.NewRequest(http.MethodGet, `/?email=a&filter={"name":{"op":"equdal","value":"s3val"},"age":{"op":"equal","value":1}}`, errReader(0))
+		r := httptest.NewRequest(http.MethodGet, `/?email=sgh370@yahoo.com&filter={"phone":{"op":"equal","value":"09034005707"},"email":{"op":"equal","value":"sgh370@yahoo.com"},"name":{"op":"equal","value":"saeed"},"lastName":{"op":"equal","value":"ghanbari"},"userName":{"op":"equal","value":"sgh370"},"nationalCode":{"op":"equal","value":"0720464201"},"birthdate":{"op":"equal","value":"a"},"avatarUrl":{"op":"equal","value":"a"},"suspended_at":{"op":"equal","value":"a"},"created_at":{"op":"equal","value":"a"}}`, errReader(0))
 
 		type FilterValue[T string | int] struct {
-			Op    string `json:"op"`
-			Value T      `json:"value"`
+			Op    string `json:"op,omitempty"`
+			Value T      `json:"value,omitempty"`
 		}
 
-		type FilterType struct {
-			Name FilterValue[string] `json:"name"`
-			Age  FilterValue[int]    `json:"age"`
+		type UserFilterType struct {
+			ID           FilterValue[int]    `json:"id,string,omitempty"`
+			Phone        FilterValue[string] `json:"phone,omitempty"`
+			Email        FilterValue[string] `json:"email,omitempty"`
+			Name         FilterValue[string] `json:"name,omitempty"`
+			LastName     FilterValue[string] `json:"lastName,omitempty"`
+			UserName     FilterValue[string] `json:"userName,omitempty"`
+			NationalCode FilterValue[string] `json:"nationalCode,omitempty"`
+			Birthdate    FilterValue[string] `json:"birthdate,omitempty"`
+			AvatarUrl    FilterValue[string] `json:"avatarUrl,omitempty"`
+			SuspendedAt  FilterValue[string] `json:"suspended_at,omitempty"`
+			CreatedAt    FilterValue[string] `json:"created_at,omitempty"`
 		}
 
 		type Query struct {
-			Email  string     `json:"email"`
-			Filter FilterType `json:"filter"`
+			Email  string         `json:"email,omitempty"`
+			Filter UserFilterType `json:"filter,omitempty"`
 		}
 
-		q := Query{}
+		q := &Query{}
 
 		schema := Schema{
 			"email": New("email").Email().Required(),
 			"filter": Schema{
-				"name": Schema{
-					"op":    New("filter.name.op").Alpha().FilterOperators().Required(),
-					"value": New("filter.name.value").Alpha().Required(),
-				},
-				"age": Schema{
-					"op":    New("filter.age.op").Alpha().Required(),
-					"value": New("filter.age.value").Alpha().Required(),
+				"phone": Schema{
+					"op":    New("filter.phone.op").Required(),
+					"value": New("filter.phone.value").Required(),
 				},
 			},
 		}
 
-		isValid, _ := ValidateQueries(r, schema, &q)
-		if isValid {
-			t.Error("should be invalid")
+		isValid, _ := ValidateQueries(r, schema, q)
+		if !isValid {
+			t.Error("should be valid")
 		}
 	})
 }
