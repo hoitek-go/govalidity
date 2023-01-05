@@ -367,6 +367,7 @@ func ValidateQueries(r *http.Request, validations Schema, structData interface{}
 	baseDataMap := Queries{}
 	dataMap := Queries{}
 	queries := r.URL.Query()
+
 	for k, v := range queries {
 		if len(v) > 0 {
 			baseDataMap[k] = v[0]
@@ -374,6 +375,7 @@ func ValidateQueries(r *http.Request, validations Schema, structData interface{}
 			baseDataMap[k] = ""
 		}
 	}
+
 	for k, v := range baseDataMap {
 		value := v.(string)
 		if isJson(value) {
@@ -382,6 +384,7 @@ func ValidateQueries(r *http.Request, validations Schema, structData interface{}
 			dataMap[k] = value
 		}
 	}
+
 	return validateByJson(baseDataMap, dataMap, validations, structData)
 }
 
@@ -391,6 +394,7 @@ func ValidateBody(r *http.Request, validations Schema, structData interface{}) (
 	dataMap := Body{}
 	var baseDataMap Body
 	err := govaliditybody.Bind(r, &baseDataMap)
+
 	if err != nil {
 		return false, ValidationErrors{
 			"UnknownError": []error{
@@ -398,6 +402,7 @@ func ValidateBody(r *http.Request, validations Schema, structData interface{}) (
 			},
 		}
 	}
+
 	for k, v := range baseDataMap {
 		switch v.(type) {
 		case string:
