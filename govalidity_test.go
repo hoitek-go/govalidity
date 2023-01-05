@@ -3,7 +3,6 @@ package govalidity
 import (
 	"errors"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -443,16 +442,9 @@ func TestValidateQueries(t *testing.T) {
 			},
 		}
 
-		isValid, errs := ValidateQueries(r, schema, q)
-		if !isValid {
-			for _, errss := range errs {
-				for _, err := range errss {
-					log.Printf("aaaaaaaaaaaaaaaaaa %#v\n", err.Error())
-				}
-			}
-		}
-		if !isValid {
-			t.Error("should be valid")
+		isValid, _ := ValidateQueries(r, schema, q)
+		if isValid {
+			t.Error("should be invalid")
 		}
 	})
 }
