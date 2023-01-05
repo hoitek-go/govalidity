@@ -29,6 +29,7 @@ type FuncSchema struct {
 type Validator struct {
 	Field        string
 	Value        interface{}
+	IsOptional   bool
 	DefaultValue string
 	Errors       []error
 	Validations  []FuncSchema
@@ -247,6 +248,11 @@ func (v *Validator) Default(value string) *Validator {
 	return v
 }
 
+func (v *Validator) Optional() *Validator {
+	v.IsOptional = true
+	return v
+}
+
 func isJson(s string) bool {
 	var j map[string]interface{}
 	if err := json.Unmarshal([]byte(s), &j); err != nil {
@@ -288,7 +294,6 @@ var validationErrors = ValidationErrors{}
 var isValid = true
 
 func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]interface{}, validations Schema, structData interface{}) (bool, ValidationErrors) {
-
 	for k, v := range validations {
 		value, ok := dataMap[k]
 		if !ok {
@@ -317,11 +322,14 @@ func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]inter
 				validateByJson(baseDataMap, value.(Schema), v.(Schema), &temp)
 			}
 		case *Validator:
-			v.(*Validator).Value = value
-			errs := v.(*Validator).run()
-			if len(errs) > 0 {
-				isValid = false
-				validationErrors[v.(*Validator).Field] = errs
+			validator := v.(*Validator)
+			validator.Value = value
+			if (!ok && !validator.IsOptional) || ok {
+				errs := validator.run()
+				if len(errs) > 0 {
+					isValid = false
+					validationErrors[validator.Field] = errs
+				}
 			}
 		}
 	}
