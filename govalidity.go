@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/hoitek-go/govalidity/govaliditybody"
 	"github.com/hoitek-go/govalidity/govalidityconv"
@@ -336,9 +337,15 @@ func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]inter
 		}
 		err = json.Unmarshal(bytes, &structData)
 		if err != nil {
+			errMsg := err.Error()
+			errMsg = strings.ReplaceAll(errMsg, "json: cannot unmarshal number into Go struct field", "")
+			errMsg = strings.ReplaceAll(errMsg, "json: cannot unmarshal string into Go struct field", "")
+			errMsg = strings.ReplaceAll(errMsg, "of type string", "")
+			errMsg = strings.TrimSpace(errMsg)
+			errMsg = "Check data type of these fields: " + errMsg
 			return false, ValidationErrors{
 				"error": {
-					errors.New("Input Data is Invalid"),
+					errors.New(errMsg),
 				},
 			}
 		}
