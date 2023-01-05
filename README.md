@@ -99,9 +99,11 @@ If your schema has some fields which are optional, you can add omitempty value t
 
 For example:
 
+~~~go  
 type UserRequest struct {
 	Email      string      `json:"email,omitempty"`
 }
+~~~ 
 
 ## Number Fields
 
@@ -109,9 +111,11 @@ If your schema has some fields which are number, you should add string value to 
 
 For example:
 
+~~~go  
 type UserRequest struct {
 	Age      int      `json:"email,string"`
 }
+~~~ 
 
 ## Nested Validation
 
