@@ -93,6 +93,26 @@ func main() {
 }
 ~~~ 
 
+## Omit Fields When They Are Optional
+
+If your schema has some fields which are optional, you can add omitempty value to json tag in the field.
+
+For example:
+
+type UserRequest struct {
+	Email      string      `json:"email,omitempty"`
+}
+
+## Number Fields
+
+If your schema has some fields which are number, you should add string value to json tag in the field.
+
+For example:
+
+type UserRequest struct {
+	Age      int      `json:"email,string"`
+}
+
 ## Nested Validation
 
 You can use nested struct as validation. for example:
