@@ -284,19 +284,22 @@ func sanitizeDataMapToJson(dataMap map[string]interface{}) map[string]interface{
 }
 
 var validationErrors = ValidationErrors{}
+var isValid = true
 
 func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]interface{}, validations Schema, structData interface{}) (bool, ValidationErrors) {
-	isValid := true
+
 	for k, v := range validations {
 		value, ok := dataMap[k]
 		if !ok {
-			value = ""
 			switch v.(type) {
 			case *Validator:
+				value = ""
 				if v.(*Validator).DefaultValue != "" {
 					value = v.(*Validator).DefaultValue
 					dataMap[k] = value
 				}
+			case Schema:
+				value = Schema{}
 			}
 		}
 		switch v.(type) {
@@ -310,10 +313,7 @@ func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]inter
 					validateByJson(baseDataMap, jsn.(Schema), v.(Schema), &temp)
 				}
 			} else {
-				switch value.(type) {
-				case Schema:
-					validateByJson(baseDataMap, value.(Schema), v.(Schema), &temp)
-				}
+				validateByJson(baseDataMap, value.(Schema), v.(Schema), &temp)
 			}
 		case *Validator:
 			v.(*Validator).Value = value
@@ -346,6 +346,7 @@ func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]inter
 
 func ValidateQueries(r *http.Request, validations Schema, structData interface{}) (bool, ValidationErrors) {
 	validationErrors = ValidationErrors{}
+	isValid = true
 	baseDataMap := Queries{}
 	dataMap := Queries{}
 	queries := r.URL.Query()
@@ -369,7 +370,7 @@ func ValidateQueries(r *http.Request, validations Schema, structData interface{}
 
 func ValidateBody(r *http.Request, validations Schema, structData interface{}) (bool, ValidationErrors) {
 	validationErrors = ValidationErrors{}
-
+	isValid = true
 	dataMap := Body{}
 	var baseDataMap Body
 	err := govaliditybody.Bind(r, &baseDataMap)
@@ -395,6 +396,8 @@ func ValidateBody(r *http.Request, validations Schema, structData interface{}) (
 }
 
 func ValidateParams(params Params, validations Schema, structData interface{}) (bool, ValidationErrors) {
+	validationErrors = ValidationErrors{}
+	isValid = true
 	baseDataMap := Body{}
 	dataMap := Body{}
 
