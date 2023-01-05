@@ -1,5 +1,12 @@
 package govalidityo
 
+import "encoding/json"
+
+type OperatorValue struct {
+	Op    string
+	Value interface{}
+}
+
 const (
 	EQUALS              = "eq"
 	NOT_EQUALS          = "neq"
@@ -21,3 +28,52 @@ const (
 	CONTAINS            = "contains"
 	CONTAINED           = "contained"
 )
+
+var MapSqlOperators = map[string]string{
+	EQUALS:              "=",
+	NOT_EQUALS:          "<>",
+	GREATER_THAN:        ">",
+	GREATER_THAN_EQUALS: ">=",
+	LESS_THAN:           "<",
+	LESS_THAN_EQUAL:     "<=",
+	LIKE:                "LIKE",
+	NOT_LIKE:            "NOT LIKE",
+	IGNORE_LIKE:         "LIKE",
+	NOT_IGNORE_LIKE:     "NOT LIKE",
+	IN:                  "IN",
+	NOT_IN:              "NOT IN",
+	IS:                  "=",
+	IS_NOT:              "<>",
+	BETWEEN:             "IN",
+	NOT_BETWEEN:         "NOT IN",
+	OVERLAP:             "=",
+	CONTAINS:            "LIKE",
+	CONTAINED:           "LIKE",
+}
+
+func getJsonSlice(str string) []string {
+	var strSlice []string
+	isValid := json.Unmarshal([]byte(str), &strSlice) == nil
+	if isValid {
+		return strSlice
+	}
+	return []string{}
+}
+
+func GetSqlOperatorValue(govalidityOperator string, value string) *OperatorValue {
+	op, ok := MapSqlOperators[govalidityOperator]
+	if !ok {
+		op = "="
+	}
+	var val interface{} = value
+	switch govalidityOperator {
+	case LIKE, NOT_LIKE, IGNORE_LIKE, NOT_IGNORE_LIKE:
+		val = "%" + value + "%"
+	case IN, NOT_IN:
+		val = getJsonSlice(value)
+	}
+	return &OperatorValue{
+		Op:    op,
+		Value: val,
+	}
+}
