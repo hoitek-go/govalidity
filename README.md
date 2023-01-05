@@ -42,13 +42,13 @@ import (
 )
 
 type UserIndexRequest struct {
-	Email      string      `json:"email"`
-	Name       string      `json:"name"`
-	Age        json.Number `json:"age"`
-	Url        string      `json:"url"`
-	Json       string      `json:"json"`
-	Ip         string      `json:"ip"`
-	FilterPage json.Number `json:"filter[page]"`
+	Email      string      `json:"email,omitempty"`
+	Name       string      `json:"name,omitempty"`
+	Age        json.Number `json:"age,omitempty"`
+	Url        string      `json:"url,omitempty"`
+	Json       string      `json:"json,omitempty"`
+	Ip         string      `json:"ip,omitempty"`
+	FilterPage json.Number `json:"filter[page],omitempty"`
 }
 
 func (data *UserIndexRequest) ValidateBody(r *http.Request) (bool, govalidity.ValidationErrors) {
@@ -131,7 +131,7 @@ type FilterValue[T string | int] struct {
 
 type FilterType struct {
     Name FilterValue[string] `json:"name"`
-    Age  FilterValue[int]    `json:"age"`
+    Age  FilterValue[int]    `json:"age,omitempty"`
 }
 
 type Query struct {
@@ -165,19 +165,8 @@ For example:
 **Sample Schema:**
 
 ~~~go  
-type FilterValue[T string | int] struct {
-    Op    string `json:"op"`
-    Value T      `json:"value"`
-}
-
-type FilterType struct {
-    Name FilterValue[string] `json:"name"`
-    Age  FilterValue[int]    `json:"age"`
-}
-
 type Query struct {
     Email  string     `json:"email"`
-    Filter FilterType `json:"filter"`
 }
 
 func (data *Query) ValidateQueries(r *http.Request) (bool, govalidity.ValidationErrors) {
@@ -188,7 +177,6 @@ func (data *Query) ValidateQueries(r *http.Request) (bool, govalidity.Validation
 		"url":          govalidity.New("url").Url().Required(),
 		"json":         govalidity.New("json").Json(),
 		"ip":           govalidity.New("ip").Ip().Required(),
-		"filter[page]": govalidity.New("filterPage).Int().InRange(10, 20).Required(),
 	}
 	return govalidity.ValidateQueries(r, schema, &data)
 }
