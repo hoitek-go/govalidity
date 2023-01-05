@@ -59,7 +59,7 @@ func (data *UserIndexRequest) ValidateBody(r *http.Request) (bool, govalidity.Va
 		"url":          govalidity.New("url").Url().Required(),
 		"json":         govalidity.New("json").Json(),
 		"ip":           govalidity.New("ip").Ip().Required(),
-		"filter[page]": govalidity.New("filterPage).Int().InRange(10, 20).Required(),
+		"filter[page]": govalidity.New("filterPage").Int().InRange(10, 20).Required(),
 	}
 	return govalidity.ValidateBody(r, schema, &data)
 }
