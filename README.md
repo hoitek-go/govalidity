@@ -87,7 +87,6 @@ func main() {
 			log.Println(err)
 			return
 		}
-		log.Printf("%#v\n", data)
 	})
 	http.ListenAndServe("127.0.0.1:9090", nil)
 }

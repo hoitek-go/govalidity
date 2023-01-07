@@ -98,6 +98,13 @@ func (v *Validator) Int() *Validator {
 	return v
 }
 
+func (v *Validator) IntSlice() *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: govalidityv.IsIntSlice,
+	})
+	return v
+}
+
 func (v *Validator) Float() *Validator {
 	v.Validations = append(v.Validations, FuncSchema{
 		Fn: govalidityv.IsFloat,
@@ -293,7 +300,7 @@ func sanitizeDataMapToJson(dataMap map[string]interface{}) map[string]interface{
 var validationErrors = ValidationErrors{}
 var isValid = true
 
-func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]interface{}, validations Schema, structData interface{}) (bool, ValidationErrors) {
+func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]interface{}, validations Schema, structData interface{}) ValidationErrors {
 	for k, v := range validations {
 		value, ok := dataMap[k]
 		if !ok {
@@ -337,7 +344,7 @@ func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]inter
 	if isValid {
 		bytes, err := json.Marshal(baseDataMap)
 		if err != nil {
-			return false, ValidationErrors{
+			return ValidationErrors{
 				"error": {
 					errors.New("Input Data is Invalid"),
 				},
@@ -351,17 +358,17 @@ func validateByJson(baseDataMap map[string]interface{}, dataMap map[string]inter
 			errMsg = strings.ReplaceAll(errMsg, "of type string", "")
 			errMsg = strings.TrimSpace(errMsg)
 			errMsg = "Check data type of these fields: " + errMsg
-			return false, ValidationErrors{
+			return ValidationErrors{
 				"error": {
 					errors.New(errMsg),
 				},
 			}
 		}
 	}
-	return isValid, validationErrors
+	return validationErrors
 }
 
-func ValidateQueries(r *http.Request, validations Schema, structData interface{}) (bool, ValidationErrors) {
+func ValidateQueries(r *http.Request, validations Schema, structData interface{}) ValidationErrors {
 	validationErrors = ValidationErrors{}
 	isValid = true
 	baseDataMap := Queries{}
@@ -388,7 +395,42 @@ func ValidateQueries(r *http.Request, validations Schema, structData interface{}
 	return validateByJson(baseDataMap, dataMap, validations, structData)
 }
 
-func ValidateBody(r *http.Request, validations Schema, structData interface{}) (bool, ValidationErrors) {
+func isSliceOfString(slice []interface{}) bool {
+	isString := false
+	for _, sliceItem := range slice {
+		_, err := govalidityconv.ToNumber(sliceItem)
+		if err != nil {
+			isString = true
+		}
+
+		if isString {
+			break
+		}
+	}
+	return isString
+}
+
+func convertToSliceOfString(slice []interface{}) []string {
+	result := []string{}
+	for _, sliceItem := range slice {
+		result = append(result, fmt.Sprintf("%s", sliceItem))
+	}
+	return result
+}
+
+func convertToSliceOfNumber(slice []interface{}) ([]float64, error) {
+	result := []float64{}
+	for _, sliceItem := range slice {
+		num, err := govalidityconv.ToNumber(sliceItem)
+		if err != nil || num == nil {
+			return []float64{}, errors.New("All of slice items should be number")
+		}
+		result = append(result, *num)
+	}
+	return result, nil
+}
+
+func ValidateBody(r *http.Request, validations Schema, structData interface{}) ValidationErrors {
 	validationErrors = ValidationErrors{}
 	isValid = true
 	dataMap := Body{}
@@ -396,7 +438,7 @@ func ValidateBody(r *http.Request, validations Schema, structData interface{}) (
 	err := govaliditybody.Bind(r, &baseDataMap)
 
 	if err != nil {
-		return false, ValidationErrors{
+		return ValidationErrors{
 			"UnknownError": []error{
 				err,
 			},
@@ -411,13 +453,33 @@ func ValidateBody(r *http.Request, validations Schema, structData interface{}) (
 			} else {
 				dataMap[k] = v.(string)
 			}
+		case []interface{}:
+			slice := v.([]interface{})
+			isString := isSliceOfString(slice)
+			sanitizedSlice := []interface{}{}
+			if isString {
+				cSlice := convertToSliceOfString(slice)
+				for _, cSliceItem := range cSlice {
+					sanitizedSlice = append(sanitizedSlice, cSliceItem)
+				}
+			} else {
+				cSlice, err := convertToSliceOfNumber(slice)
+				if err != nil {
+					sanitizedSlice = []interface{}{}
+				}
+				for _, cSliceItem := range cSlice {
+					sanitizedSlice = append(sanitizedSlice, cSliceItem)
+				}
+			}
+			jsonData := convertToJson(sanitizedSlice)
+			dataMap[k] = jsonData
 		}
 	}
 
 	return validateByJson(baseDataMap, dataMap, validations, structData)
 }
 
-func ValidateParams(params Params, validations Schema, structData interface{}) (bool, ValidationErrors) {
+func ValidateParams(params Params, validations Schema, structData interface{}) ValidationErrors {
 	validationErrors = ValidationErrors{}
 	isValid = true
 	baseDataMap := Body{}

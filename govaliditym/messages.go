@@ -28,6 +28,7 @@ var DefaultErrorMessages map[string]string = map[string]string{
 	"IsMaxLength":       "{field} can only have less than {max} characters",
 	"IsIn":              "{field} can only be {in}",
 	"IsFilterOperators": "{field} can only contains {in} operators",
+	"IsSlice":           "{field} can only be an array",
 }
 
 type Validations struct {
@@ -56,6 +57,7 @@ type Validations struct {
 	IsMaxLength       string
 	IsIn              string
 	IsFilterOperators string
+	IsSlice           string
 }
 
 type Labels = map[string]string
@@ -86,6 +88,7 @@ var Default *Validations = &Validations{
 	IsMaxLength:       DefaultErrorMessages["IsMaxLength"],
 	IsIn:              DefaultErrorMessages["IsIn"],
 	IsFilterOperators: DefaultErrorMessages["IsFilterOperators"],
+	IsSlice:           DefaultErrorMessages["IsSlice"],
 }
 
 var FieldLabels *Labels = &Labels{}

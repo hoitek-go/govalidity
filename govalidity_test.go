@@ -89,6 +89,14 @@ func TestInt(t *testing.T) {
 	}
 }
 
+func TestIntSlice(t *testing.T) {
+	v := New("label")
+	v.IntSlice()
+	if len(v.Validations) <= 0 {
+		t.Error("IntSlice validator should be set in validations")
+	}
+}
+
 func TestFloat(t *testing.T) {
 	v := New("label")
 	v.Float()
@@ -251,8 +259,8 @@ func TestValidateBody(t *testing.T) {
 			Email string `json:"email"`
 		}
 		q := Query{}
-		isValid, _ := ValidateBody(r, schema, &q)
-		if isValid {
+		errs := ValidateBody(r, schema, &q)
+		if len(errs) == 0 {
 			t.Error("Should throw error when body is nil")
 		}
 	})
@@ -272,8 +280,8 @@ func TestValidateBody(t *testing.T) {
 			Email string `json:"email"`
 		}
 		q := Query{}
-		isValid, _ := ValidateBody(r, schema, &q)
-		if isValid {
+		errs := ValidateBody(r, schema, &q)
+		if len(errs) == 0 {
 			t.Error("Should throw error when body is not prepare")
 		}
 	})
@@ -303,8 +311,23 @@ func TestValidateBody(t *testing.T) {
 			Email string `json:"email"`
 		}
 		q := Query{}
-		isValid, _ := ValidateBody(r, schema, &q)
-		if !isValid {
+		errs := ValidateBody(r, schema, &q)
+		if len(errs) != 0 {
+			t.Error("should be valid")
+		}
+	})
+
+	t.Run("Body with slice of int", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(`{"ids":[1,2,3]}`))
+		schema := Schema{
+			"ids": New("ids").IntSlice(),
+		}
+		type Query struct {
+			IDs []int `json:"ids"`
+		}
+		q := Query{}
+		errs := ValidateBody(r, schema, &q)
+		if len(errs) != 0 {
 			t.Error("should be valid")
 		}
 	})
@@ -334,8 +357,8 @@ func TestValidateBody(t *testing.T) {
 			Email string `json:"email"`
 		}
 		q := Query{}
-		isValid, _ := ValidateBody(r, schema, &q)
-		if isValid {
+		errs := ValidateBody(r, schema, &q)
+		if len(errs) == 0 {
 			t.Error("should be invalid")
 		}
 	})
@@ -365,8 +388,8 @@ func TestValidateBody(t *testing.T) {
 			Email string `json:"email"`
 		}
 		q := Query{}
-		isValid, _ := ValidateBody(r, schema, &q)
-		if isValid {
+		errs := ValidateBody(r, schema, &q)
+		if len(errs) == 0 {
 			t.Error("should be invalid")
 		}
 	})
@@ -382,8 +405,8 @@ func TestValidateQueries(t *testing.T) {
 			Email string `json:"email"`
 		}
 		q := Query{}
-		isValid, _ := ValidateQueries(r, schema, &q)
-		if isValid {
+		errs := ValidateQueries(r, schema, &q)
+		if len(errs) == 0 {
 			t.Error("Should throw error when body is not prepare")
 		}
 	})
@@ -397,13 +420,13 @@ func TestValidateQueries(t *testing.T) {
 			Email string `json:"email"`
 		}
 		q := Query{}
-		isValid, _ := ValidateQueries(r, schema, &q)
-		if !isValid {
+		errs := ValidateQueries(r, schema, &q)
+		if len(errs) != 0 {
 			t.Error("should be valid")
 		}
 	})
 
-	t.Run("tsetsetset", func(t *testing.T) {
+	t.Run("Check Nested", func(t *testing.T) {
 		r := httptest.NewRequest(http.MethodGet, `/?email=sgh370@yahoo.com&filter={"phone":{"op":"equal","value":1},"email":{"op":"equal","value":"sgh370@yahoo.com"},"name":{"op":"equal","value":"saeed"},"lastName":{"op":"equal","value":"ghanbari"},"userName":{"op":"equal","value":"sgh370"},"nationalCode":{"op":"equal","value":"0720464201"},"birthdate":{"op":"equal","value":"a"},"avatarUrl":{"op":"equal","value":"a"},"suspended_at":{"op":"equal","value":"a"},"created_at":{"op":"equal","value":"a"}}`, errReader(0))
 
 		type FilterValue[T string | int] struct {
@@ -442,8 +465,8 @@ func TestValidateQueries(t *testing.T) {
 			},
 		}
 
-		isValid, _ := ValidateQueries(r, schema, q)
-		if isValid {
+		errs := ValidateQueries(r, schema, q)
+		if len(errs) == 0 {
 			t.Error("should be invalid")
 		}
 	})
