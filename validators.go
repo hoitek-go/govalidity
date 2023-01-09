@@ -1,6 +1,9 @@
 package govalidity
 
-import "github.com/hoitek-go/govalidity/govalidityv"
+import (
+	"github.com/hoitek-go/govalidity/govalidityv"
+	"time"
+)
 
 type FuncSchema struct {
 	Fn func(string, ...interface{}) (bool, error)
@@ -237,5 +240,104 @@ func (v *Validator) Default(value string) *Validator {
 
 func (v *Validator) Optional() *Validator {
 	v.IsOptional = true
+	return v
+}
+
+func (v *Validator) Min(min int) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMin(f, v.Value, min)
+		},
+	})
+	return v
+}
+
+func (v *Validator) Max(max int) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMax(f, v.Value, max)
+		},
+	})
+	return v
+}
+
+func (v *Validator) MinDate(min time.Time) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMinDate(f, v.Value, min)
+		},
+	})
+	return v
+}
+
+func (v *Validator) MaxDate(max time.Time) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMaxDate(f, v.Value, max)
+		},
+	})
+	return v
+}
+
+func (v *Validator) MinTime(min time.Time) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMinTime(f, v.Value, min)
+		},
+	})
+	return v
+}
+
+func (v *Validator) MaxTime(max time.Time) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMaxTime(f, v.Value, max)
+		},
+	})
+	return v
+}
+
+func (v *Validator) MinDateTime(min time.Time) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMinDateTime(f, v.Value, min)
+		},
+	})
+	return v
+}
+
+func (v *Validator) MaxDateTime(max time.Time) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMaxDateTime(f, v.Value, max)
+		},
+	})
+	return v
+}
+
+func (v *Validator) MinLengthIfPresent(min int) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMinLengthIfPresent(f, v.Value, min)
+		},
+	})
+	return v
+}
+
+func (v *Validator) MaxLengthIfPresent(max int) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMaxLengthIfPresent(f, v.Value, max)
+		},
+	})
+	return v
+}
+
+func (v *Validator) MinIfPresent(min int) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsMinIfPresent(f, v.Value, min)
+		},
+	})
 	return v
 }

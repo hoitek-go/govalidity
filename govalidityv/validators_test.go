@@ -114,6 +114,10 @@ var validationTestCases []ValidationsTest = []ValidationsTest{
 	{Fn: IsAlphaNum, Name: "IsAlphaNum", Field: "name", Params: "77test", ExpectedValid: true, ExpectedError: nil},
 	{Fn: IsAlphaNum, Name: "IsAlphaNum", Field: "name", Params: "test77", ExpectedValid: true, ExpectedError: nil},
 	{Fn: IsAlphaNum, Name: "IsAlphaNum", Field: "name", Params: ".s", ExpectedValid: false, ExpectedError: GetErrorMessageByFieldValue(govaliditym.Default.IsAlphaNum, "name", ".s")},
+	//{Fn: IsMin, Name: "IsMin", Field: "age", Params: []int{18, 17}, ExpectedValid: true, ExpectedError: nil},
+	//{Fn: IsMin, Name: "IsMin", Field: "age", Params: 17, ExpectedValid: false, ExpectedError: GetErrorMessageByFieldValue(govaliditym.Default.IsMin, "age", 17)},
+	//{Fn: IsMax, Name: "IsMax", Field: "age", Params: 18, ExpectedValid: true, ExpectedError: nil},
+	//{Fn: IsMax, Name: "IsMax", Field: "age", Params: 19, ExpectedValid: false, ExpectedError: GetErrorMessageByFieldValue(govaliditym.Default.IsMax, "age", 19)},
 }
 
 func TestValidations(t *testing.T) {

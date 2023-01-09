@@ -29,6 +29,14 @@ var DefaultErrorMessages map[string]string = map[string]string{
 	"IsIn":              "{field} can only be {in}",
 	"IsFilterOperators": "{field} can only contains {in} operators",
 	"IsSlice":           "{field} can only be an array",
+	"IsMin":             "{field} can only be greater than {min}",
+	"IsMax":             "{field} can only be less than {max}",
+	"IsMinDate":         "{field} can only be greater than {min}",
+	"IsMaxDate":         "{field} can only be less than {max}",
+	"IsMinTime":         "{field} can only be greater than {min}",
+	"IsMaxTime":         "{field} can only be less than {max}",
+	"IsMinDateTime":     "{field} can only be greater than {min}",
+	"IsMaxDateTime":     "{field} can only be less than {max}",
 }
 
 type Validations struct {
@@ -58,6 +66,14 @@ type Validations struct {
 	IsIn              string
 	IsFilterOperators string
 	IsSlice           string
+	IsMin             string
+	IsMax             string
+	IsMinDate         string
+	IsMaxDate         string
+	IsMinTime         string
+	IsMaxTime         string
+	IsMinDateTime     string
+	IsMaxDateTime     string
 }
 
 type Labels = map[string]string
@@ -89,6 +105,14 @@ var Default *Validations = &Validations{
 	IsIn:              DefaultErrorMessages["IsIn"],
 	IsFilterOperators: DefaultErrorMessages["IsFilterOperators"],
 	IsSlice:           DefaultErrorMessages["IsSlice"],
+	IsMin:             DefaultErrorMessages["IsMin"],
+	IsMax:             DefaultErrorMessages["IsMax"],
+	IsMinDate:         DefaultErrorMessages["IsMinDate"],
+	IsMaxDate:         DefaultErrorMessages["IsMaxDate"],
+	IsMinTime:         DefaultErrorMessages["IsMinTime"],
+	IsMaxTime:         DefaultErrorMessages["IsMaxTime"],
+	IsMinDateTime:     DefaultErrorMessages["IsMinDateTime"],
+	IsMaxDateTime:     DefaultErrorMessages["IsMaxDateTime"],
 }
 
 var FieldLabels *Labels = &Labels{}
