@@ -5,15 +5,11 @@ import (
 	"fmt"
 	"github.com/hoitek-go/govalidity/govalidityconv"
 	"github.com/hoitek-go/govalidity/govaliditym"
-	"strconv"
 	"strings"
 )
 
-func IsMinMaxLength(field string, params ...interface{}) (bool, error) {
+func IsEndWith(field string, dataValue interface{}, str string) (bool, error) {
 	fieldLabel := field
-	dataValue := params[0]
-	min := params[1].(int)
-	max := params[2].(int)
 
 	label, ok := (*govaliditym.FieldLabels)[field]
 	if ok {
@@ -28,15 +24,14 @@ func IsMinMaxLength(field string, params ...interface{}) (bool, error) {
 		value = dataValue.(string)
 	}
 
-	errMessage := strings.ReplaceAll(govaliditym.Default.IsMinMaxLength, "{field}", fieldLabel)
-	errMessage = strings.ReplaceAll(errMessage, "{value}", value)
-	errMessage = strings.ReplaceAll(errMessage, "{min}", strconv.Itoa(min))
-	errMessage = strings.ReplaceAll(errMessage, "{max}", strconv.Itoa(max))
-	err := errors.New(errMessage)
-
-	if len(value) < min || len(value) > max {
-		return false, err
+	if strings.Index(value, str) == len(value)-1 {
+		return true, nil
 	}
 
-	return true, nil
+	errMessage := strings.ReplaceAll(govaliditym.Default.IsMaxLength, "{field}", fieldLabel)
+	errMessage = strings.ReplaceAll(errMessage, "{value}", value)
+	errMessage = strings.ReplaceAll(errMessage, "{str}", str)
+	err := errors.New(errMessage)
+
+	return false, err
 }

@@ -341,3 +341,12 @@ func (v *Validator) MinIfPresent(min int) *Validator {
 	})
 	return v
 }
+
+func (v *Validator) StartWith(str string) *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsStartWith(f, v.Value, str)
+		},
+	})
+	return v
+}
