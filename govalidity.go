@@ -214,6 +214,8 @@ func ValidateBody(r *http.Request, validations Schema, structData interface{}) V
 			} else {
 				dataMap[k] = v.(string)
 			}
+		case float64:
+			dataMap[k] = v.(float64)
 		case []interface{}:
 			slice := v.([]interface{})
 			isString := isSliceOfString(slice)

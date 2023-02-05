@@ -6,6 +6,7 @@ import (
 )
 
 func IsInt(field string, params ...interface{}) (bool, error) {
+
 	label, value := GetFieldLabelAndValue(field, params)
 	err := GetErrorMessageByFieldValue(govaliditym.Default.IsInt, label, value)
 	str := value.(string)

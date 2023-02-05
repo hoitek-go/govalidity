@@ -293,11 +293,11 @@ func TestValidateBody(t *testing.T) {
 					"test",
 				},
 			},
-			Body: io.NopCloser(strings.NewReader("{\"email\":\"sgh370@yahoo.com\",\"name\":\"saeed\",\"lastName\":\"ghanbari\",\"age\":\"50\",\"url\":\"https://google.com\",\"json\":\"{\\\"key\\\":\\\"value\\\"}\",\"ip\":\"127.0.0.1\",\"filter[page]\":\"12\"}")),
+			Body: io.NopCloser(strings.NewReader("{\"email\":\"sgh370@yahoo.com\",\"name\":9,\"lastName\":\"ghanbari\",\"age\":\"50\",\"url\":\"https://google.com\",\"json\":\"{\\\"key\\\":\\\"value\\\"}\",\"ip\":\"127.0.0.1\",\"filter[page]\":\"12\"}")),
 		}
 		schema := Schema{
 			"email":    New("email").Email().MinLength(5).Required(),
-			"name":     New("name").LowerCase().MinMaxLength(3, 20).In([]string{"saeed", "taher"}).Required(),
+			"name":     New("name").Max(10).Int().Required(),
 			"lastName": New("lastname").LowerCase().MaxLength(25).Required(),
 			"age":      New("age").Number().Default("20").Required(),
 			"url":      New("url").Url().Required(),
@@ -308,6 +308,7 @@ func TestValidateBody(t *testing.T) {
 			}).Required(),
 		}
 		type Query struct {
+			Name  int    `json:"name"`
 			Email string `json:"email"`
 		}
 		q := Query{}
