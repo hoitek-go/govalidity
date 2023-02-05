@@ -60,6 +60,13 @@ func (v *Validator) Alpha() *Validator {
 	return v
 }
 
+func (v *Validator) Filepath() *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: govalidityv.IsFilepath,
+	})
+	return v
+}
+
 func (v *Validator) LowerCase() *Validator {
 	v.Validations = append(v.Validations, FuncSchema{
 		Fn: govalidityv.IsLowerCase,

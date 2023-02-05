@@ -8,6 +8,7 @@ var DefaultErrorMessages map[string]string = map[string]string{
 	"IsNumber":          "{field} can be a valid number",
 	"IsUrl":             "{field} can be a valid url",
 	"IsAlpha":           "{field} can only contain alphabet characters",
+	"IsFilepath":        "{field} can only be a valid file path",
 	"IsLowerCase":       "{field} can only be lowercase",
 	"IsUpperCase":       "{field} can only be uppercase",
 	"IsInt":             "{field} can only be a valid integer number",
@@ -45,6 +46,7 @@ type Validations struct {
 	IsNumber          string
 	IsUrl             string
 	IsAlpha           string
+	IsFilepath        string
 	IsLowerCase       string
 	IsUpperCase       string
 	IsInt             string
@@ -84,6 +86,7 @@ var Default *Validations = &Validations{
 	IsNumber:          DefaultErrorMessages["IsNumber"],
 	IsUrl:             DefaultErrorMessages["IsUrl"],
 	IsAlpha:           DefaultErrorMessages["IsAlpha"],
+	IsFilepath:        DefaultErrorMessages["IsFilepath"],
 	IsLowerCase:       DefaultErrorMessages["IsLowerCase"],
 	IsUpperCase:       DefaultErrorMessages["IsUpperCase"],
 	IsInt:             DefaultErrorMessages["IsInt"],
