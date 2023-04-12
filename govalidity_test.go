@@ -364,6 +364,25 @@ func TestValidateBody(t *testing.T) {
 		}
 	})
 
+	t.Run("TestNumbers", func(t *testing.T) {
+		r := &http.Request{
+			Body: io.NopCloser(strings.NewReader("{\"age\":\"12\",\"year\":2023}")),
+		}
+		schema := Schema{
+			"age":  New("age").Int().Required(),
+			"year": New("year").Int().Required(),
+		}
+		type Query struct {
+			Age  int `json:"age,string"`
+			Year int `json:"year"`
+		}
+		q := Query{}
+		errs := ValidateBody(r, schema, &q)
+		if len(errs) > 0 {
+			t.Error("should be valid")
+		}
+	})
+
 	t.Run("Default", func(t *testing.T) {
 		r := &http.Request{
 			Form: url.Values{
