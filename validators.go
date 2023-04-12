@@ -357,3 +357,10 @@ func (v *Validator) StartWith(str string) *Validator {
 	})
 	return v
 }
+
+func (v *Validator) HexColor() *Validator {
+	v.Validations = append(v.Validations, FuncSchema{
+		Fn: govalidityv.IsHexColor,
+	})
+	return v
+}

@@ -521,3 +521,11 @@ func TestDumpErrors(t *testing.T) {
 		t.Error("result is not the same as input errors")
 	}
 }
+
+func TestHexColor(t *testing.T) {
+	v := New("label")
+	v.HexColor()
+	if len(v.Validations) <= 0 {
+		t.Error("HexColor validator should be set in validations")
+	}
+}

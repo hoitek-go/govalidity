@@ -38,6 +38,7 @@ var DefaultErrorMessages map[string]string = map[string]string{
 	"IsMaxTime":         "{field} can only be less than {max}",
 	"IsMinDateTime":     "{field} can only be greater than {min}",
 	"IsMaxDateTime":     "{field} can only be less than {max}",
+	"IsHexColor":        "{field} can only be a valid hex color",
 }
 
 type Validations struct {
@@ -76,6 +77,7 @@ type Validations struct {
 	IsMaxTime         string
 	IsMinDateTime     string
 	IsMaxDateTime     string
+	IsHexColor        string
 }
 
 type Labels = map[string]string
@@ -116,6 +118,7 @@ var Default *Validations = &Validations{
 	IsMaxTime:         DefaultErrorMessages["IsMaxTime"],
 	IsMinDateTime:     DefaultErrorMessages["IsMinDateTime"],
 	IsMaxDateTime:     DefaultErrorMessages["IsMaxDateTime"],
+	IsHexColor:        DefaultErrorMessages["IsHexColor"],
 }
 
 var FieldLabels *Labels = &Labels{}
