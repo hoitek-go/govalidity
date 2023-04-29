@@ -35,6 +35,11 @@ func FilterOperators(field string, params ...interface{}) (bool, error) {
 			govalidityo.OVERLAP,
 			govalidityo.CONTAINS,
 			govalidityo.CONTAINED,
+			govalidityo.IS_EMPTY,
+			govalidityo.IS_NOT_EMPTY,
+			govalidityo.IS_ANY_OF,
+			govalidityo.STARTS_WITH,
+			govalidityo.ENDS_WITH,
 		)
 	}
 
