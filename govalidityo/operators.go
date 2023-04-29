@@ -8,57 +8,35 @@ type OperatorValue struct {
 }
 
 const (
-	EQUALS              = "equals"
-	NOT_EQUALS          = "neq"
-	GREATER_THAN        = "gt"
-	GREATER_THAN_EQUALS = "gte"
-	LESS_THAN           = "lt"
-	LESS_THAN_EQUAL     = "lte"
-	LIKE                = "like"
-	NOT_LIKE            = "nlike"
-	IGNORE_LIKE         = "ilike"
-	NOT_IGNORE_LIKE     = "nilike"
-	IN                  = "in"
-	NOT_IN              = "nin"
-	IS                  = "is"
-	IS_NOT              = "isnot"
-	BETWEEN             = "between"
-	NOT_BETWEEN         = "nbetween"
-	OVERLAP             = "overlap"
-	CONTAINS            = "contains"
-	CONTAINED           = "contained"
-	STARTS_WITH         = "startsWith"
-	ENDS_WITH           = "endsWith"
-	IS_EMPTY            = "isEmpty"
-	IS_NOT_EMPTY        = "isNotEmpty"
-	IS_ANY_OF           = "isAnyOf"
+	EQUALS                     = "equals"
+	CONTAINS                   = "contains"
+	STARTS_WITH                = "startsWith"
+	ENDS_WITH                  = "endsWith"
+	IS_EMPTY                   = "isEmpty"
+	IS_NOT_EMPTY               = "isNotEmpty"
+	IS_ANY_OF                  = "isAnyOf"
+	NUMBER_EQUALS              = "="
+	NUMBER_NOT_EQUALS          = "!="
+	NUMBER_GREATER_THAN        = ">"
+	NUMBER_GREATER_THAN_EQUALS = ">="
+	NUMBER_LESS_THAN           = "<"
+	NUMBER_LESS_THAN_EQUALS    = "<="
 )
 
 var MapSqlOperators = map[string]string{
-	EQUALS:              "=",
-	NOT_EQUALS:          "!=",
-	GREATER_THAN:        ">",
-	GREATER_THAN_EQUALS: ">=",
-	LESS_THAN:           "<",
-	LESS_THAN_EQUAL:     "<=",
-	LIKE:                "LIKE",
-	NOT_LIKE:            "NOT LIKE",
-	IGNORE_LIKE:         "iLIKE",
-	NOT_IGNORE_LIKE:     "NOT iLIKE",
-	IN:                  "IN",
-	NOT_IN:              "NOT IN",
-	IS:                  "=",
-	IS_NOT:              "<>",
-	BETWEEN:             "IN",
-	NOT_BETWEEN:         "NOT IN",
-	OVERLAP:             "=",
-	CONTAINS:            "LIKE",
-	CONTAINED:           "LIKE",
-	STARTS_WITH:         "LIKE",
-	ENDS_WITH:           "LIKE",
-	IS_EMPTY:            "IS NULL",
-	IS_NOT_EMPTY:        "IS NOT NULL",
-	IS_ANY_OF:           "IN",
+	EQUALS:                     "=",
+	CONTAINS:                   "LIKE",
+	STARTS_WITH:                "LIKE",
+	ENDS_WITH:                  "LIKE",
+	IS_EMPTY:                   "IS NULL",
+	IS_NOT_EMPTY:               "IS NOT NULL",
+	IS_ANY_OF:                  "IN",
+	NUMBER_EQUALS:              "=",
+	NUMBER_NOT_EQUALS:          "!=",
+	NUMBER_GREATER_THAN:        ">",
+	NUMBER_GREATER_THAN_EQUALS: ">=",
+	NUMBER_LESS_THAN:           "<",
+	NUMBER_LESS_THAN_EQUALS:    "<=",
 }
 
 func getJsonSlice(str string) []string {
@@ -77,9 +55,9 @@ func GetSqlOperatorValue(govalidityOperator string, value string) *OperatorValue
 	}
 	var val interface{} = value
 	switch govalidityOperator {
-	case LIKE, NOT_LIKE, IGNORE_LIKE, NOT_IGNORE_LIKE:
+	case CONTAINS, STARTS_WITH, ENDS_WITH:
 		val = "%" + value + "%"
-	case IN, NOT_IN:
+	case IS_ANY_OF:
 		val = getJsonSlice(value)
 	}
 	return &OperatorValue{
