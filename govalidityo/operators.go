@@ -21,6 +21,12 @@ const (
 	NUMBER_GREATER_THAN_EQUALS = ">="
 	NUMBER_LESS_THAN           = "<"
 	NUMBER_LESS_THAN_EQUALS    = "<="
+	DATE_IS                    = "is"
+	DATE_IS_NOT                = "isNot"
+	DATE_IS_AFTER              = "isAfter"
+	DATE_IS_BEFORE             = "isBefore"
+	DATE_IS_ON_OR_AFTER        = "isOnOrAfter"
+	DATE_IS_ON_OR_BEFORE       = "isOnOrBefore"
 )
 
 var MapSqlOperators = map[string]string{
@@ -37,6 +43,12 @@ var MapSqlOperators = map[string]string{
 	NUMBER_GREATER_THAN_EQUALS: ">=",
 	NUMBER_LESS_THAN:           "<",
 	NUMBER_LESS_THAN_EQUALS:    "<=",
+	DATE_IS:                    "=",
+	DATE_IS_NOT:                "!=",
+	DATE_IS_AFTER:              ">",
+	DATE_IS_BEFORE:             "<",
+	DATE_IS_ON_OR_AFTER:        ">=",
+	DATE_IS_ON_OR_BEFORE:       "<=",
 }
 
 func getJsonSlice(str string) []string {
