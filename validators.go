@@ -53,9 +53,11 @@ func (v *Validator) Url() *Validator {
 	return v
 }
 
-func (v *Validator) Alpha() *Validator {
+func (v *Validator) Alpha(locale string) *Validator {
 	v.Validations = append(v.Validations, FuncSchema{
-		Fn: govalidityv.IsAlpha,
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsAlpha(f, v.Value, locale)
+		},
 	})
 	return v
 }
@@ -165,9 +167,11 @@ func (v *Validator) Logitude() *Validator {
 	return v
 }
 
-func (v *Validator) AlphaNum() *Validator {
+func (v *Validator) AlphaNum(locale string) *Validator {
 	v.Validations = append(v.Validations, FuncSchema{
-		Fn: govalidityv.IsAlphaNum,
+		Fn: func(f string, i ...interface{}) (bool, error) {
+			return govalidityv.IsAlphaNum(f, v.Value, locale)
+		},
 	})
 	return v
 }

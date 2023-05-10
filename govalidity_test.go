@@ -2,7 +2,9 @@ package govalidity
 
 import (
 	"errors"
+	"github.com/hoitek-go/govalidity/govalidityl"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -59,7 +61,7 @@ func TestUrl(t *testing.T) {
 
 func TestAlpha(t *testing.T) {
 	v := New("label")
-	v.Alpha()
+	v.Alpha(govalidityl.EnUS)
 	if len(v.Validations) <= 0 {
 		t.Error("Alpha validator should be set in validations")
 	}
@@ -179,7 +181,7 @@ func TestLogitude(t *testing.T) {
 
 func TestAlphaNum(t *testing.T) {
 	v := New("label")
-	v.AlphaNum()
+	v.AlphaNum(govalidityl.EnUS)
 	if len(v.Validations) <= 0 {
 		t.Error("AlphaNum validator should be set in validations")
 	}
@@ -411,6 +413,24 @@ func TestValidateBody(t *testing.T) {
 		errs := ValidateBody(r, schema, &q)
 		if len(errs) == 0 {
 			t.Error("should be invalid")
+		}
+	})
+
+	t.Run("Test Alpha", func(t *testing.T) {
+		r := &http.Request{
+			Body: io.NopCloser(strings.NewReader("{\"name\":\"järvenpää\"}")),
+		}
+		schema := Schema{
+			"name": New("name").Alpha(govalidityl.EnUS).Required(),
+		}
+		type Payload struct {
+			Name string `json:"name"`
+		}
+		p := Payload{}
+		errs := ValidateBody(r, schema, &p)
+		log.Println(errs)
+		if len(errs) > 0 {
+			t.Error("should be valid")
 		}
 	})
 }
